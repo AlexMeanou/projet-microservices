@@ -1,0 +1,30 @@
+venv/
+__pycache__/
+mongodb/__pycache__/
+mongodb/data/
+mongodb/dbb/
+
+front/wtwt/.DS_Store
+front/wtwt/node_modules
+front/wtwt/dist
+
+
+# local env files
+front/wtwt/.env.local
+front/wtwt/.env.*.local
+
+# Log files
+front/wtwt/npm-debug.log*
+front/wtwt/yarn-debug.log*
+front/wtwt/yarn-error.log*
+front/wtwt/pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
