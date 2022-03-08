@@ -1,6 +1,6 @@
 <template>
-    <v-layout row wrap>
-        <v-flex  v-for="movie in movies" :key="movie.id">
+    <v-layout >
+        <v-flex v-for="movie in movies" :key="movie.id">
             <v-card  class="ma-3" width="300" height="500" >
                  <v-card-title>{{movie.nom}}</v-card-title>
                 <div class="card-text"><b>genre : {{movie.genre}}</b></div>
@@ -73,6 +73,10 @@ export default {
 </script>
 
 <style scoped>
+
+.v-layout{
+    flex-wrap:wrap;
+}
  .v-card{
      position:relative;
     

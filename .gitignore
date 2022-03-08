@@ -28,6 +28,3 @@ front/wtwt/pnpm-debug.log*
 *.sln
 *.sw?
 
-#node Module gitignore
-front/projet/node_modules
-

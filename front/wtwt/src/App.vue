@@ -4,7 +4,7 @@
   <v-app>
     <div id="nav">
         <router-link to="/">Home</router-link> |
-        <router-link to="/info">About</router-link>
+        <router-link to="/info">Info</router-link>
     </div>
     <router-view></router-view>
     <v-main>
