@@ -52,7 +52,6 @@ def import_rating(ratings_file):
     for line in read_tsv: 
         myquery = { "_id": line[0] }
         newvalues = { "$set": { "averageRating": line[1], "numVotes" : line[2]} }
-        print(myquery, newvalues)
         movies.update_one(myquery, newvalues)
 
 def import_files_in_mongodb(path = "tmp", database = 'wtwt'):
