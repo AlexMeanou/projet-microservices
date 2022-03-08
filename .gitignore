@@ -2,7 +2,7 @@
 __pycache__/
 mongodb/__pycache__/
 mongodb/data/
-mongodb/dbb/
+mongodb/BDD/
 
 front/wtwt/.DS_Store
 front/wtwt/node_modules
