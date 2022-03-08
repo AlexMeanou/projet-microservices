@@ -18,7 +18,7 @@
         <label for="select-genre">Filtre par genre</label>
       </div>
       <input class="form-control" type="text" v-model="search" placeholder="rechercher film"/>
-        <button button type="button" class="btn-primary" @click=" init()">Rechercher</button>
+        <button button type="button" class="btn-primary" @click=" filtrerFilm()">Rechercher</button>
     </div>
     <!-- test v-text-field-->
      <!-- <v-text-field style="width:30%; margin:auto;" hint="Merci de confirmer votre recherche." filled v-model="search" color="#e4872c"
@@ -26,16 +26,14 @@
     <v-btn small color="#e4872c" class=" mx-3 mt-3" @click=" init()">
       <div class="caption">CONFIRMER LA RECHERCHE</div>
     </v-btn> -->
-    <v-sheet class="pa-3">
-      <v-skeleton-loader class="mx-auto" max-width="300px" type="card"></v-skeleton-loader>
-     <film-grid/>
-    </v-sheet>
-    <v-pagination color="#e4872c" v-model="page" :length="20" :value="page"></v-pagination>
+     <film-grid :page="page" :movies="movies"/>
+    <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
   </div>
 </template>
 
 <script>
 import FilmGrid from '@/components/FilmGrid.vue';
+import movies from '../assets/data/movies'
 export default{
   components : {
     FilmGrid
@@ -45,14 +43,20 @@ export default{
       filtreLangue: '',
       filtreGenre: '',
       search : '',
-      page : 1
+      page : 1,
+      movies
     }
   },
+  mounted(){
+  },
   methods: {
-    init() {
+    filtrerFilm() {
       console.log("recherche :",this.search);
       console.log("filtreFilm",this.filtreGenre);
-      console.log("filtreLangue",this.filtreLangue)
+      console.log("filtreLangue",this.filtreLangue);
+    },
+    changePage(){
+      console.log("page numero",this.page);
     }
   }
 }
