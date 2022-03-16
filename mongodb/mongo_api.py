@@ -23,6 +23,5 @@ async def get_one_by_id(movie_id: str):
 
 @app.get("/movies")
 async def get_movies_order_by_date():
-    print(movies.find().sort({ "startYear" : -1 } ).next())
-    return  movies.find().sort({ "startYear" : -1 } ).next()
+    return movies.find()
 
