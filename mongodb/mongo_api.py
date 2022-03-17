@@ -21,8 +21,10 @@ async def root():
 async def get_one_by_id(movie_id: str):
     return [ a for a in movies.find({"_id" : movie_id})]
 
-@app.get("/movies")
-async def get_movies_order_by_date():
-    print(movies.find().sort({ "startYear" : -1 } ).next())
-    return  movies.find().sort({ "startYear" : -1 } ).next()
+@app.get("/movies/{page}")
+async def get_movies_by_page(page : int):
+    return [m for m in movies.find().skip(page * 10).limit(10)]
 
+@app.get("/action_movies/{page}")
+async def get_movies_by_page(page : int):
+    return [m for m in movies.find().skip(page * 10).limit(10)]

@@ -1,8 +1,11 @@
+
 <template>
   <div id="home">
+    <!-- menu -->
+    <Menu/>
     <div class="search">
        <div class="form-floating">
-        <select id="select-langue" class="form-select" aria-label="filtre par langue" v-model="filtreLangue">
+        <select id="select-langue" class="form-select" aria-label="filtre par langue" v-model="filterLangage" @change="filter()">
           <option value="francais">Francais</option>
           <option value="anglais">Anglais</option>
           <option value="espagnol">Espagnol</option>
@@ -10,15 +13,15 @@
         <label for="select-langue">Filtre par langue</label>
       </div>
       <div class="form-floating">
-        <select id="select-genre" class="form-select" aria-label="filtre par genre" v-model="filtreGenre">
+        <select id="select-genre" class="form-select" aria-label="filtre par genre" v-model="filterGenre" @change="filter()">
           <option value="action">Action</option>
           <option value="romantique">Romantique</option>
           <option value="sf">Science Fiction</option>
         </select>
         <label for="select-genre">Filtre par genre</label>
       </div>
-      <input class="form-control" type="text" v-model="search" placeholder="rechercher film"/>
-        <button button type="button" class="btn-primary" @click=" filtrerFilm()">Rechercher</button>
+      <input class="form-control" type="text" v-model="filterSearch" placeholder="rechercher film"/>
+        <button button type="button" class="btn-primary" @click="search()">Rechercher</button>
     </div>
     <!-- test v-text-field-->
      <!-- <v-text-field style="width:30%; margin:auto;" hint="Merci de confirmer votre recherche." filled v-model="search" color="#e4872c"
@@ -32,28 +35,37 @@
 </template>
 
 <script>
-import FilmGrid from '@/components/FilmGrid.vue';
+import FilmGrid from '../components/FilmGrid.vue';
 import movies from '../assets/data/movies'
+import Menu from '../components/Menu.vue';
 export default{
   components : {
-    FilmGrid
+    FilmGrid,
+    Menu,
   },  
   data : function(){
     return {
-      filtreLangue: '',
-      filtreGenre: '',
-      search : '',
+      filterLangage: '',
+      filterGenre: '',
+      filterSearch : '',
       page : 1,
-      movies
+      movies,
     }
   },
   mounted(){
   },
   methods: {
-    filtrerFilm() {
-      console.log("recherche :",this.search);
-      console.log("filtreFilm",this.filtreGenre);
-      console.log("filtreLangue",this.filtreLangue);
+    filter() {
+      // on envoit les differents filtres et le numero de page pour chercher dans l'api les n premiers films correspondant à la langue
+      console.log("filtre langue :",this.filterLangage);
+      console.log("filtre genre",this.filterGenre);
+      console.log("page numero",this.page);
+    },
+    filterAction(){
+      console.log("test");
+    },
+    search() {
+      console.log("recherche :",this.filterSearch);
     },
     changePage(){
       console.log("page numero",this.page);
@@ -63,6 +75,10 @@ export default{
 </script>
 
 <style scoped lang="scss">
+  // .navbar{
+  //   width:90%;
+  //   justify-content:space-between;
+  // }
   .search{
     margin:auto;
     display:flex;
@@ -78,6 +94,8 @@ export default{
     }
     button{
        margin-left:10px;
+       background-color:black;
+       width:200px;
     }
     
   }
