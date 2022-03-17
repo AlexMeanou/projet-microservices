@@ -1,5 +1,8 @@
+
 <template>
   <div id="home">
+    <!-- menu -->
+    <Menu/>
     <div class="search">
        <div class="form-floating">
         <select id="select-langue" class="form-select" aria-label="filtre par langue" v-model="filterLangage" @change="filter()">
@@ -32,11 +35,13 @@
 </template>
 
 <script>
-import FilmGrid from '@/components/FilmGrid.vue';
+import FilmGrid from '../components/FilmGrid.vue';
 import movies from '../assets/data/movies'
+import Menu from '../components/Menu.vue';
 export default{
   components : {
-    FilmGrid
+    FilmGrid,
+    Menu,
   },  
   data : function(){
     return {
@@ -56,6 +61,9 @@ export default{
       console.log("filtre genre",this.filterGenre);
       console.log("page numero",this.page);
     },
+    filterAction(){
+      console.log("test");
+    },
     search() {
       console.log("recherche :",this.filterSearch);
     },
@@ -67,6 +75,10 @@ export default{
 </script>
 
 <style scoped lang="scss">
+  // .navbar{
+  //   width:90%;
+  //   justify-content:space-between;
+  // }
   .search{
     margin:auto;
     display:flex;

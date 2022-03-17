@@ -1,10 +1,8 @@
-<script>
-export default {
-  name: "Connexion"
-}
-</script>
+
 
 <template>
+<div class="connexion">
+  <Menu/>
   <div class="form-group">
     <h2 class="title"></h2>
     <div>
@@ -16,9 +14,18 @@ export default {
       <input class="form-control" type="password" v-model="password" id="password">
     </div>
   </div>
+</div>
 </template>
 
-
+<script>
+import Menu from "../components/Menu.vue"
+export default {
+  name: "Connexion",
+  components :{
+    Menu
+  }
+}
+</script>
 
 <style lang="scss">
 
