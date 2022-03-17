@@ -3,7 +3,7 @@ import requests
 
 
 def get_movie_by_id(id: string):
-    return requests.get('https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
+    return requests.get(f'https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
 
 # def getMoviesListID(idList : list):
 #     res = []
