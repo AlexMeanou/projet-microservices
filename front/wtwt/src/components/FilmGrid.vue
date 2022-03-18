@@ -1,7 +1,7 @@
 <template>
     <v-layout >
         <v-flex v-for="movie in movies" :key="movie.id">
-            <v-card  class="ma-3" width="300" height="500" >
+            <v-card  class="ma-3" >
                  <v-card-title>{{movie.nom}}</v-card-title>
                 <div class="card-text"><b>genre : {{movie.genre}}</b></div>
                 <v-img :src="movie.url" ></v-img>
@@ -30,9 +30,15 @@ export default {
 <style scoped>
 
 .v-layout{
+    z-index:-1 !important;
+    margin-top:15px;
+    margin-left:100px;
     flex-wrap:wrap;
+    justify-content: space-evenly;
 }
  .v-card{
+     width:300px;
+     height: 500px;;
      position:relative;
     
  }

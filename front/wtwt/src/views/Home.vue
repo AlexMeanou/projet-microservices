@@ -1,47 +1,52 @@
 
 <template>
   <div id="home">
-    <!-- menu -->
-    <Menu/>
-    <div class="search">
-       <div class="form-floating">
-        <select id="select-langue" class="form-select" aria-label="filtre par langue" v-model="filterLangage" @change="filter()">
-          <option value="francais">Francais</option>
-          <option value="anglais">Anglais</option>
-          <option value="espagnol">Espagnol</option>
-        </select>
-        <label for="select-langue">Filtre par langue</label>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+          <ul class="navbar-nav">
+            <li class="nav-item"> <a class="nav-link" @onclick="filterAction()">Action</a> </li>
+            <li class="item"><a class="nav-link" @onclick="filterComedie()">Commédie</a></li>
+            <li class="nav-item"><a class="nav-link" @onclick="filterAnime()">Anime</a></li>
+            <li class="nav-item"> <a class="nav-link"  @onclick="filterRomantique()">Romantique</a> </li>
+            <li class="nav-item"><a class="nav-link" @onclick="filterScienceFiction()">Science Fiction</a> </li>
+            <li class="nav-item"><select class="nav-link" aria-label="genre" @change="changeGenre()">
+                <option selected>Tous les genres</option>
+                <option value="action">Action</option>
+                <option value="comedie">Comedie</option>
+                <option value="anime">Anime</option>
+                <option value="anime">Romantique</option>
+                <option value="sf">Science Fiction</option>
+              </select>
+            </li>
+            <li>
+              <form style="margin-left:10px" class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn" type="submit">Search</button>
+              </form>
+            </li>
+          </ul>
       </div>
-      <div class="form-floating">
-        <select id="select-genre" class="form-select" aria-label="filtre par genre" v-model="filterGenre" @change="filter()">
-          <option value="action">Action</option>
-          <option value="romantique">Romantique</option>
-          <option value="sf">Science Fiction</option>
-        </select>
-        <label for="select-genre">Filtre par genre</label>
+    </nav>
+
+    <div class="main-container">
+      <vertical-menu/>
+      <div class="grid-container">
+        <film-grid :page="page" :movies="movies"/>
+        <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
       </div>
-      <input class="form-control" type="text" v-model="filterSearch" placeholder="rechercher film"/>
-        <button button type="button" class="btn-primary" @click="search()">Rechercher</button>
     </div>
-    <!-- test v-text-field-->
-     <!-- <v-text-field style="width:30%; margin:auto;" hint="Merci de confirmer votre recherche." filled v-model="search" color="#e4872c"
-      label="Chercher" placeholder="Film, Series, Artistes ..." outlined></v-text-field>
-    <v-btn small color="#e4872c" class=" mx-3 mt-3" @click=" init()">
-      <div class="caption">CONFIRMER LA RECHERCHE</div>
-    </v-btn> -->
-     <film-grid :page="page" :movies="movies"/>
-    <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
   </div>
 </template>
 
-<script>
+<script> 
 import FilmGrid from '../components/FilmGrid.vue';
 import movies from '../assets/data/movies'
-import Menu from '../components/Menu.vue';
+import VerticalMenu from '../components/VerticalMenu.vue';
 export default{
+  name:'Home',
   components : {
     FilmGrid,
-    Menu,
+    VerticalMenu,
   },  
   data : function(){
     return {
@@ -62,7 +67,19 @@ export default{
       console.log("page numero",this.page);
     },
     filterAction(){
-      console.log("test");
+      console.log(" on renvoit un json de film triés par action");
+    },
+    filterComedie(){
+         console.log(" on renvoit un json de film triés par comédie");
+    },
+    filterAnime(){
+        console.log(" on renvoit un json de film triés par anime");
+    },
+    filterRomantique(){
+        console.log(" on renvoit un json de film triés par romantique");
+    },
+    filterScienceFiction(){
+        console.log(" on renvoit un json de film triés par science fiction");
     },
     search() {
       console.log("recherche :",this.filterSearch);
@@ -75,29 +92,30 @@ export default{
 </script>
 
 <style scoped lang="scss">
-  // .navbar{
-  //   width:90%;
-  //   justify-content:space-between;
-  // }
-  .search{
-    margin:auto;
+  .navbar{
+    position:fixed !important;
+    padding-top:70px;
+    background-color: black;
+    width:100%;
+  }
+  .nav-link{
+    color:white !important;
+  }
+  .nav-link:hover{
+    text-decoration: underline;
+  }
+
+  .btn{
+    color:white;
+    border-color:white;
+  }
+  .btn:hover{
+    font-weight: 450;
+    color:white;
+  }
+  .main-container{
     display:flex;
-    justify-content: center;
-    .form-select{
-      margin-left:10px;
-      width:200px;
-    }
-    .form-control{
-      margin-left:10px;
-      width:30%; 
-      background-color:"#e4872c";
-    }
-    button{
-       margin-left:10px;
-       background-color:black;
-       width:200px;
-    }
-    
+    justify-content: space-evenly;
   }
   
 </style>
