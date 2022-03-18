@@ -87,7 +87,9 @@ export default{
     changePage(){
       console.log("page numero",this.page);
        this.axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .then(response => (this.info = response));
+      .then(response => {
+        this.movies = response
+      });
     }
   }
 }
