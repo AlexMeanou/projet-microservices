@@ -95,6 +95,7 @@ export default{
   .navbar{
     position:fixed !important;
     padding-top:70px;
+    padding-bottom:20px;
     background-color: black;
     width:100%;
   }

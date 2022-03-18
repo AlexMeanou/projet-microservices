@@ -8,15 +8,14 @@
       <label for="name">nom</label>
       <input class="form-control" type="text" v-model="name" id="name">
     </div>
-    <div class="invalid"> Please provide a valid city </div>
     <div>
       <label for="password">mot de passe</label>
       <input class="form-control" type="password" v-model="password" id="password">
     </div>
     <button type="submit" class="btn btn-primary" :disabled="!isValid()" @click="connect()">Se connecter</button>
     <p>Pas encore inscrit ? <a class="link"><router-link to="/inscription">S'inscrire</router-link></a> </p>
+    <div v-if="loginError" class="alert alert-danger" role="alert"> Le nom ou le mot de passe est incorrect !</div>
   </div>
-  <font-awesome-icon icon="fa-solid fa-user-secret"/>
 </div>
 
 <!-- <div class="form-floating">
@@ -41,6 +40,7 @@ export default {
         name: '',
         password: '',
         users,
+        loginError: false
     }
   },
   methods:{
@@ -52,7 +52,21 @@ export default {
       return this.name && this.password;
     },
     isValid(){
-      return this.isNotEmpty() && this.isLoginCorrect();
+      return this.isNotEmpty();
+    },
+    connect(){
+      if(this.isValid()){
+        // traitement back
+        if(this.isLoginCorrect()){
+          console.log("connexion reussie");
+          localStorage.name=this.name;
+          this.$router.push('/');
+          this.$router.go();
+        }
+        else{
+          this.loginError=true;
+        }
+      }
     }
   }
 }
@@ -62,7 +76,7 @@ export default {
 
 .form-group{
   width:400px;
-   margin-top:40px;
+   margin-top:150px !important;
   margin-right:auto;
   margin-left:auto;
   .title{
