@@ -8,7 +8,6 @@
 </div>
 </template>
 <script>
-import axios from 'axios';
 import Menu from "./components/Menu.vue"
 export default {
   components : {  
@@ -20,8 +19,6 @@ export default {
         } 
     },
     mounted(){
-         axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .then(response => (this.info = response))
 
   },
   methods:{
