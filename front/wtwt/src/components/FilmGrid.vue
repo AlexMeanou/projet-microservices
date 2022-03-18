@@ -1,10 +1,10 @@
 <template>
     <v-layout >
-        <v-flex v-for="movie in movies" :key="movie.id">
+        <v-flex v-for="movie in movies" :key="movie._id">
             <v-card  class="ma-3" >
-                 <v-card-title>{{movie.nom}}</v-card-title>
-                <div class="card-text"><b>genre : {{movie.genre}}</b></div>
-                <v-img :src="movie.url" ></v-img>
+                 <v-card-title>{{movie.title}}</v-card-title>
+                <div class="card-text"><b>genres : {{movie.genres}}</b></div>
+                <v-img :src="movie.image" ></v-img>
                
             </v-card>
         </v-flex>

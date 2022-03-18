@@ -58,6 +58,7 @@ export default{
     }
   },
   mounted(){
+    this.changePage()
   },
   methods: {
     filter() {
@@ -85,9 +86,13 @@ export default{
       console.log("recherche :",this.filterSearch);
     },
     changePage(){
+      this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
       console.log("page numero",this.page);
-       this.axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .then(response => (this.info = response));
+       this.axios.get('http://127.0.0.1:8000/movies/' + this.page)
+      .then(response =>{
+        this.movies = response.data
+        console.log(this.movies)
+      } );
     }
   }
 }
