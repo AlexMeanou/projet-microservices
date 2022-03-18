@@ -11,7 +11,7 @@ async def root():
 
 
 @app.get('/proposistions')
-async def movie_by_genre(id):
+async def movie_by_id(id):
     res = get_movie_by_id(id=id)
     # print(res.json())
     return res.json()

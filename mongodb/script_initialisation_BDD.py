@@ -38,7 +38,7 @@ def download_files(path = "tmp"):
     
     count = 0
     for r in res:
-        print("%d/{len(urls)}", count)
+        print(f"{count}/{len(urls)}")
         count += 1 
 
 def import_rating(ratings_file): 

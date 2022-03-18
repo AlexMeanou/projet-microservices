@@ -46,4 +46,10 @@ export default  [ {
         genre : 'aventure',
         url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
     },
+    {
+        id:'7',
+        nom:'Pirates des Caraibes',
+        genre : 'aventure',
+        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+    },
 ];
