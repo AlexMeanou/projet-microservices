@@ -6,6 +6,7 @@
     <div>
       <label for="name">nom</label>
       <input class="form-control" type="text" v-model="name" id="name">
+      <div v-if="!isNameExists()" class="invalid"> Entrez un nom !</div>
     </div>
     <div>
       <label for="password">mot de passe</label>
@@ -17,7 +18,9 @@
     </div>
     <button type="submit" class="btn btn-primary" :disabled="!isValid()" @click="subscribe()">S'inscrire</button>
     <p>Déja inscrit ? <a class="link"><router-link to="/connexion">Se connecter</router-link></a> </p>
+    <div v-if="!isPasswordsEqual() && password && password2" class="alert alert-danger" role="alert"> Les mots de passes ne correspondent pas !</div>
   </div>
+
 </div>
 
 <!-- <div class="form-floating">
@@ -67,7 +70,7 @@ export default {
 
 .form-group{
   width:400px;
-   margin-top:40px;
+  margin-top:150px !important;
   margin-right:auto;
   margin-left:auto;
   .title{

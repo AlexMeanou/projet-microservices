@@ -86,6 +86,8 @@ export default{
     },
     changePage(){
       console.log("page numero",this.page);
+       this.axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+      .then(response => (this.info = response));
     }
   }
 }
@@ -95,6 +97,7 @@ export default{
   .navbar{
     position:fixed !important;
     padding-top:70px;
+    padding-bottom:20px;
     background-color: black;
     width:100%;
   }

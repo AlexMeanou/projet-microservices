@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "axios": "^0.26.1",
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
+    "vue-axios": "^3.4.1",
     "vue-router": "^4.0.13",
     "vuetify": "npm:@vuetify/nightly@next",
     "vuex": "^4.0.2",
@@ -42,9 +44,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {    
+    "rules": {
       "vue/multi-word-component-names": "off"
-   }
+    }
   },
   "browserslist": [
     "> 1%",

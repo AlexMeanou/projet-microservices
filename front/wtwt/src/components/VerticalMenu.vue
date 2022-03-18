@@ -55,7 +55,7 @@ export default {
 
 .side-nav {
   position: fixed;
-  top:116px;
+  top:118px;
   left:0;
 }
 
@@ -82,7 +82,7 @@ export default {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #000;
+  background: black;
 }
 
 .d1 {background: crimson;}
@@ -96,7 +96,7 @@ export default {
   display: flex;
   justify-content: center;
   cursor: pointer;
-  border-bottom: 1px solid #f2f2f21e;
+  border-bottom: 1px solid black;
   .form-group{
     margin-top:5px !important;
      width:90%;

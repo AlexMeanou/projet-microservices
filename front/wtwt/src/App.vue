@@ -14,12 +14,14 @@ export default {
     Menu
   }, 
     data(){
-        return {}
+        return {
+          isLogin : false
+        } 
     },
     mounted(){
-        console.log("ok",this.page);
-    },
-    methods:{
+
+  },
+  methods:{
 
     }
 }

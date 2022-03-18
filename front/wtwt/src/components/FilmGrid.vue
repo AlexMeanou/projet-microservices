@@ -31,7 +31,7 @@ export default {
 
 .v-layout{
     z-index:-1 !important;
-    margin-top:15px;
+    margin-top:30px;
     margin-left:100px;
     flex-wrap:wrap;
     justify-content: space-evenly;
