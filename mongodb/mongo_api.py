@@ -46,7 +46,20 @@ async def get_one_by_id(movie_id: str):
     return [ a for a in movies.find({"_id" : movie_id})]
 
 @app.get("/movies/{page}")
-async def get_movies_by_page(page : int):
+async def get_all_movies_by_page(page : int):
+    page -= 1
+    l_movies = []
+    for movie in movies.find().sort("averageRating").skip(page * 10).limit(10):
+        if not is_enough_for_home_page(movie): 
+            refersh_movie_data(movie['_id'])
+            new_data_movie = movies.find({"_id" : movie['_id']})
+            l_movies.append(new_data_movie)
+        else : 
+            l_movies.append(movie)
+    return l_movies
+
+@app.get("/movies/{genre}/{page}")
+async def get_all_movies_by_page(genre : str, page : int):
     page -= 1
     l_movies = []
     for movie in movies.find().skip(page * 10).limit(10):
