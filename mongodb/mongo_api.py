@@ -78,4 +78,9 @@ async def genres():
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
 
+@app.get("/movies/{genre}/{page}")
+async def get_movie_by_genre_and_page_number(genre, page:int):
+    # limite = page * 10
+    skip = page - 1
+    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
