@@ -1,0 +1,12 @@
+services:
+  microservices:
+    build: .
+    environment: 
+      - MONGODB_CONNSTRING=mongodb://toto:tata@mongodb
+    ports:
+      - 8585:8585
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=toto
+      - MONGO_INITDB_ROOT_PASSWORD=tata

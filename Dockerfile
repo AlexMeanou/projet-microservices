@@ -15,7 +15,8 @@ RUN python3.8 -m pip install --upgrade pip
 RUN python3.8 -m pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 # 
-COPY ./imdb_api /code/app
+COPY ./fast_api /code/app
 
+ENV PYTHONPATH "${PYTHONPATH}:/code/app"
 # 
-CMD ["uvicorn", "app.imdb_api:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8585"]
