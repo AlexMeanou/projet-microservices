@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Connexion from "../views/Connexion";
 import Inscription from "../views/Inscription";
 import Preferences from "../views/Preferences";
+import Groupe from "../views/Groupe";
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
     path: '/preferences',
     name: 'Preferences',
     component: Preferences
+  },
+  {
+    path: '/groupe',
+    name: 'Groupe',
+    component: Groupe
   },
   {
     path: '/connexion',

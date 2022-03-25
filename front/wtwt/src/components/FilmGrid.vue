@@ -1,25 +1,38 @@
 <template>
-    <v-layout >
-        <v-flex v-for="movie in movies" :key="movie._id">
-            <v-card  class="ma-3" >
-                 <v-card-title>{{movie.title}}</v-card-title>
-                <div class="card-text"><b>genres : {{movie.genres}}</b></div>
-                <v-img :src="movie.image" ></v-img>
-               
-            </v-card>
-        </v-flex>
-    </v-layout>
+
+    <div>
+        <div class="grid" v-if="filterMovies.length==movies.length">
+            <div v-for="movie in movies" :key="movie._id">
+                <v-card  class="ma-3" >
+                    <v-card-title>{{movie.title}}</v-card-title>
+                    <div class="card-text"><b>genres : {{movie.genres}}</b></div>
+                    <div class="card-text"><b>langues : {{movie.languages}}</b></div>
+                    <v-img :src="movie.image" ></v-img>    
+                </v-card>
+            </div>
+        </div>
+        <div class="grid" v-else>
+            <div v-for="movie in filterMovies" :key="movie._id">
+                <v-card  class="ma-3" >
+                    <v-card-title>{{movie.title}}</v-card-title>
+                    <div class="card-text"><b>genres : {{movie.genres}}</b></div>
+                    <div class="card-text"><b>langues : {{movie.languages}}</b></div>
+                    <v-img :src="movie.image" ></v-img>    
+                </v-card>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
 export default {
     name: 'FilmGrid',
-    props : ['page','movies'],
+    props : ['movies','filterMovies'],
     data(){
         return {}
     },
     mounted(){
-        console.log("ok",this.page);
+        console.log("filter",this.filterMovies);
     },
     methods:{
 
@@ -29,12 +42,17 @@ export default {
 
 <style scoped>
 
-.v-layout{
-    z-index:-1 !important;
-    margin-top:30px;
+.grid{
+    overflow:hidden;
+    margin-top:120px;
     margin-left:100px;
+    z-index:-1;
+    display: flex;
     flex-wrap:wrap;
-    justify-content: space-evenly;
+    justify-content:center start;
+
+    width:100%;
+
 }
  .v-card{
      width:300px;

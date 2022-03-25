@@ -4,18 +4,19 @@
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
           <ul class="navbar-nav">
-            <li class="nav-item"> <a class="nav-link" @onclick="filterAction()">Action</a> </li>
-            <li class="item"><a class="nav-link" @onclick="filterComedie()">Commédie</a></li>
-            <li class="nav-item"><a class="nav-link" @onclick="filterAnime()">Anime</a></li>
-            <li class="nav-item"> <a class="nav-link"  @onclick="filterRomantique()">Romantique</a> </li>
-            <li class="nav-item"><a class="nav-link" @onclick="filterScienceFiction()">Science Fiction</a> </li>
-            <li class="nav-item"><select class="nav-link" aria-label="genre" @change="changeGenre()">
-                <option selected>Tous les genres</option>
-                <option value="action">Action</option>
-                <option value="comedie">Comedie</option>
-                <option value="anime">Anime</option>
-                <option value="anime">Romantique</option>
-                <option value="sf">Science Fiction</option>
+            <li class="nav-item"> <a class="nav-link" @click="clickOnGenre(Enum.genre.ACTION)">Action</a> </li>
+            <li class="item"><a class="nav-link" @click="clickOnGenre(Enum.genre.COMEDIE)">Commédie</a></li>
+            <li class="nav-item"><a class="nav-link" @click="clickOnGenre(Enum.genre.ANIME)">Anime</a></li>
+            <li class="nav-item"> <a class="nav-link"  @click="clickOnGenre(Enum.genre.ROMANTIQUE)">Romantique</a> </li>
+            <li class="nav-item"><a class="nav-link" @click="clickOnGenre(Enum.genre.SCIENCEFICTION)">Science Fiction</a> </li>
+            <li class="nav-item">
+              <select class="nav-link selected-genre" aria-label="genre" v-model="selectedGenre" @change="selectGenre()">
+                <option v-bind:value="Enum.genre.TOUS" selected>Tous les genres</option>
+                <option v-bind:value="Enum.genre.ACTION">Action</option>
+                <option v-bind:value="Enum.genre.COMEDIE">Comedie</option>
+                <option v-bind:value="Enum.genre.ANIME">Anime</option>
+                <option v-bind:value="Enum.genre.ROMANTIQUE">Romantique</option>
+                <option v-bind:value="Enum.genre.SCIENCEFICTION">Science Fiction</option>
               </select>
             </li>
             <li>
@@ -28,10 +29,10 @@
       </div>
     </nav>
 
-    <div class="main-container">
-      <vertical-menu/>
-      <div class="grid-container">
-        <film-grid :page="page" :movies="movies"/>
+    <div class="container">
+      <vertical-menu class="col" @langues="selectLangues($event)" @acteurs="selectActeurs($event)"/>
+      <div class="grid-container col">
+        <film-grid :movies="movies" :filterMovies="filterMovies"/>
         <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
       </div>
     </div>
@@ -42,6 +43,7 @@
 import FilmGrid from '../components/FilmGrid.vue';
 import movies from '../assets/data/movies'
 import VerticalMenu from '../components/VerticalMenu.vue';
+import Enum from "../utils/enum"
 export default{
   name:'Home',
   components : {
@@ -50,49 +52,70 @@ export default{
   },  
   data : function(){
     return {
-      filterLangage: '',
-      filterGenre: '',
-      filterSearch : '',
+      Enum,
+      filterList : {
+        genre : 0,
+        langues : [],
+        acteurs : [],
+      },
       page : 1,
       movies,
+      filterMovies:movies,
+      selectedGenre : "",
     }
   },
   mounted(){
-    this.changePage()
   },
   methods: {
-    filter() {
-      // on envoit les differents filtres et le numero de page pour chercher dans l'api les n premiers films correspondant à la langue
-      console.log("filtre langue :",this.filterLangage);
-      console.log("filtre genre",this.filterGenre);
-      console.log("page numero",this.page);
+    clickOnGenre(genreId) {
+      this.filterList.genre=genreId;
+    
+       this.filter();
     },
-    filterAction(){
-      console.log(" on renvoit un json de film triés par action");
-    },
-    filterComedie(){
-         console.log(" on renvoit un json de film triés par comédie");
-    },
-    filterAnime(){
-        console.log(" on renvoit un json de film triés par anime");
-    },
-    filterRomantique(){
-        console.log(" on renvoit un json de film triés par romantique");
-    },
-    filterScienceFiction(){
-        console.log(" on renvoit un json de film triés par science fiction");
+    selectGenre(){
+      this.filterList.genre=this.selectedGenre;
+       this.filter();
     },
     search() {
       console.log("recherche :",this.filterSearch);
     },
+    selectLangues(langues){
+      this.filterList.langues=langues;
+      this.filter();
+    },
+    selectActeurs(acteurs){
+      this.filterList.acteurs=acteurs;
+   
+     
+    },
+    filter(){
+      this.filterMovies = this.movies.filter(x=>{
+        if (this.filterList.genre!==Enum.genre.TOUS){
+            return x.genres==this.filterList.genre
+        }
+        else{
+          return true;
+        }
+      });
+      
+      this.filterMovies=this.filterMovies.filter(x=>
+          this.filterList.langues.every(l=>{
+            return x.languages.includes(l);
+      }));
+      
+    },
+    filterGenre(){
+
+    },
     changePage(){
-      this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-      console.log("page numero",this.page);
-       this.axios.get('http://127.0.0.1:8000/movies/' + this.page)
-      .then(response =>{
-        this.movies = response.data
-        console.log(this.movies)
-      } );
+      console.log("filerList",this.filterList);
+      // this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+      // console.log("page numero",this.page);
+      //  this.axios.get('http://127.0.0.1:8000/movies/' + this.page)
+      // .then(response =>{
+      //   this.movies = response.data
+      //   console.log(this.movies)
+      // } );
     }
   }
 }
@@ -105,9 +128,13 @@ export default{
     padding-bottom:20px;
     background-color: black;
     width:100%;
+    z-index:30;
   }
   .nav-link{
     color:white !important;
+  }
+  .select-genre{
+    text-decoration : none !important;
   }
   .nav-link:hover{
     text-decoration: underline;
@@ -120,10 +147,6 @@ export default{
   .btn:hover{
     font-weight: 450;
     color:white;
-  }
-  .main-container{
-    display:flex;
-    justify-content: space-evenly;
   }
   
 </style>

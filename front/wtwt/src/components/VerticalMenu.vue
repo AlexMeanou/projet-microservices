@@ -1,4 +1,4 @@
-<template>
+<template class="vertical-menu">
      <nav class="side-nav">
       <div class="wrapper">
         <div class="three-dots-container">
@@ -11,43 +11,61 @@
           <div class="form-group" id="form-group">
             <label class="form-label" for="form-group">langues</label>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox"> francais
+              <input class="form-check-input" type="checkbox" v-model="langues" v-bind:value="Enum.langue.FRANCAIS" @change="$emit('langues',langues)"> francais
             </div>
              <div class="form-check">
-              <input class="form-check-input" type="checkbox"> Anglais
+              <input class="form-check-input" type="checkbox" v-model="langues" v-bind:value="Enum.langue.ANGLAIS" @change="$emit('langues',langues)"> Anglais
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox"> Espagnol
+              <input class="form-check-input" type="checkbox" v-model="langues" v-bind:value="Enum.langue.ESPAGNOL" @change="$emit('langues',langues)"> Espagnol
             </div>
           </div>
         </div>
         <div class="nav-bloc langue">
-        <div class="form-group">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox"> francais
-          </div>
+          <div class="form-group checkbox">
+            <label class="form-label" for="form-group">acteurs</label>
             <div class="form-check">
-            <input class="form-check-input" type="checkbox"> Anglais
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox"> Espagnol
+              <input class="form-check-input" type="checkbox" v-model="acteurs" v-bind:value="Enum.acteur.DICAPRIO" @change="$emit('acteurs',acteurs)"> Leonardo Dicaprio
+            </div>
+              <div class="form-check">
+              <input class="form-check-input" type="checkbox" v-model="acteurs" v-bind:value="Enum.acteur.BRAD_PITT" @change="$emit('acteurs',acteurs)"> Brad Pitt
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" v-model="acteurs" v-bind:value="Enum.acteur.JOHNNY_DEPP" @change="$emit('acteurs',acteurs)"> Johnny Depp
+            </div>
+            {{showDialog}}
+            <a class="nav-link" @click="showDialog = true">Tous afficher</a>
+             <actors-modal v-if="showDialog" :showDialog="showDialog" :Enum="Enum"/>
           </div>
         </div>
       </div>
-      </div>
+     
     </nav>
 </template>
 
 <script>
+import ActorsModal from '../components/ActorsModal.vue';
 export default {
-    name: "Vertical-Menu",
+  components: { 
+    ActorsModal 
+  },
+    name: "VerticalMenu",
     data(){
-        return {}
+        return {
+          langues:[],
+          acteurs:[],
+          Enum:this.$parent.Enum,
+          showDialog : false,
+        }
     },
     mounted(){
     },
     methods:{
+      openActorsDialog(){
+        console.log("open dialog",this.acteurs);
+      }
     }
+
 }
 </script>
 
@@ -55,8 +73,9 @@ export default {
 
 .side-nav {
   position: fixed;
-  top:118px;
+  top:125px;
   left:0;
+  z-index:30;
 }
 
 /* To hide the sub-nav */
@@ -103,9 +122,18 @@ export default {
      .form-title{
        text-align:center;
      }
-     .form-check{
-       
+     .form-label{
+       font-weight:500;
      }
+     .nav-link{
+       color:white;
+     }
+     .nav-link:hover{
+       text-decoration: underline;
+     }
+  }
+  .form-group.checkbox{
+    height:50px;
   }
 }
 
