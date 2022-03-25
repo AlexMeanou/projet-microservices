@@ -10,3 +10,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=toto
       - MONGO_INITDB_ROOT_PASSWORD=tata
+    volumes:
+      - storage:/data/bd
+volumes:
+  storage:
+    external: true
