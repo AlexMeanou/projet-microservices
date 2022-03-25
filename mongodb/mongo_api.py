@@ -74,11 +74,23 @@ async def get_all_movies_by_page(genre : str, page : int):
 @app.get("/genres/")
 async def genres():
     import itertools
-    print(set(list(itertools.chain([m["genres"] for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(10)]))))
+    return len(set(list(itertools.chain(*[ m['genres'].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(100000)]))))
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
+@app.get("/borne_note/")
+async def borne_note():
+    import itertools
+    vote = set([int(m.get('numVotes', 0)) for m in movies.find({},{ "numVotes": 1 , "_id" : 0}).limit(100000)])
+    return [min(vote), max(vote)]
+    
 
-@app.get("/movies/{genre}/{page}")
+@app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}")
+async def get_movie_by_genre_and_page_number(genre, page:int):
+    # limite = page * 10
+    skip = page - 1
+    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+
+@app.get("/movies/{mot_clef}")
 async def get_movie_by_genre_and_page_number(genre, page:int):
     # limite = page * 10
     skip = page - 1
