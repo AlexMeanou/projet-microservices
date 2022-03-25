@@ -1,55 +1,64 @@
 export default  [ {
-        id:'1',
-        nom:'James Bond',
-        genre : 'action',
-        url :"https://m.media-amazon.com/images/I/51GSe7yqQ-L._AC_.jpg"
+        "movie._id":'1',
+        title:'James Bond',
+        genres : 6,
+        image :"https://m.media-amazon.com/images/I/51GSe7yqQ-L._AC_.jpg",
+        languages : [2],
     },
     {
-        id:'2',
-        nom:'Peter Pan',
-        genre : 'aventure',
-        url :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz1_902QZeJ_I_wVR-b9cN9Webts5BS0pbbBELKOMP4ply0hTB1DF8gBDyjs3AlWOZmMQ&usqp=CAU"
+        "movie._id":'2',
+        title:'Peter Pan',
+        genres : 4,
+        languages : [0],
+        image :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz1_902QZeJ_I_wVR-b9cN9Webts5BS0pbbBELKOMP4ply0hTB1DF8gBDyjs3AlWOZmMQ&usqp=CAU"
     },
      {
-        id:'3',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'3',
+        title:'Pirates des Caraibes',
+        genres :2,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1,2],
     },
     {
-        id:'4',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'4',
+        title:'Pirates des Caraibes',
+        genres :1,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1,2,3],
     },
      {
-        id:'3',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'3',
+        title:'Pirates des Caraibes',
+        genres :1,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [3],
     },
      {
-        id:'5',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'5',
+        title:'Pirates des Caraibes',
+        genres : 2,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1,2],
     },
      {
-        id:'6',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'6',
+        title:'Pirates des Caraibes',
+        genres : 3,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1,3],
     },
      {
-        id:'7',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'7',
+        title:'Pirates des Caraibes',
+        genres : 4,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1],
     },
     {
-        id:'7',
-        nom:'Pirates des Caraibes',
-        genre : 'aventure',
-        url :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg"
+        "movie._id":'7',
+        title:'Pirates des Caraibes',
+        genres : 3,
+        image :"https://fr.web.img4.acsta.net/medias/nmedia/18/35/07/46/affiche2.jpg",
+        languages : [1,2],
     },
 ];

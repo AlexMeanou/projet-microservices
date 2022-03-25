@@ -28,4 +28,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+html{
+  background: black;
+  }
 </style>
