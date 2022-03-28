@@ -1,13 +1,14 @@
-<template>
 
+
+<template>
     <div>
         <div class="grid" v-if="filterMovies.length==movies.length">
             <div v-for="movie in movies" :key="movie._id">
-                <v-card  class="ma-3" >
+                <v-card  class="ma-3">
                     <v-card-title>{{movie.title}}</v-card-title>
                     <div class="card-text"><b>genres : {{movie.genres}}</b></div>
-                    <div class="card-text"><b>langues : {{movie.languages}}</b></div>
-                    <v-img :src="movie.image" ></v-img>    
+                    {{showModal}}
+                    <router-link :to="{path: '/film/'+movie._id}"><v-img :src="movie.image"></v-img></router-link>
                 </v-card>
             </div>
         </div>
@@ -16,26 +17,31 @@
                 <v-card  class="ma-3" >
                     <v-card-title>{{movie.title}}</v-card-title>
                     <div class="card-text"><b>genres : {{movie.genres}}</b></div>
-                    <div class="card-text"><b>langues : {{movie.languages}}</b></div>
-                    <v-img :src="movie.image" ></v-img>    
+                    <router-link :to="{path: '/film/'+movie._id}"><v-img :src="movie.image"></v-img></router-link>
                 </v-card>
             </div>
         </div>
     </div>
 </template>
 
+
+
 <script>
 export default {
+    components :{
+    },
     name: 'FilmGrid',
     props : ['movies','filterMovies'],
     data(){
-        return {}
-    },
-    mounted(){
-        console.log("filter",this.filterMovies);
+        return {
+            showDialog:false,
+        }
     },
     methods:{
-
+       goToFilm(){
+           let url = '/film/';
+           this.$router.push(url);
+       }
     }
 }
 </script>
@@ -76,7 +82,9 @@ export default {
     margin:0;
     padding:0;
     width: 100%;
-    height: auto;
-    
+    height: auto; 
+}
+.v-img:hover{
+    cursor:pointer;
 }
 </style>

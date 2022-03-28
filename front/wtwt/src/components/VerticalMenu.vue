@@ -35,7 +35,7 @@
             </div>
             {{showDialog}}
             <a class="nav-link" @click="showDialog = true">Tous afficher</a>
-             <actors-modal v-if="showDialog" :showDialog="showDialog" :Enum="Enum"/>
+             <actors-modal v-if="showDialog" :showDialog="showDialog" :Enum="Enum" @showDialog="closeDialog($event)"/>
           </div>
         </div>
       </div>
@@ -63,6 +63,10 @@ export default {
     methods:{
       openActorsDialog(){
         console.log("open dialog",this.acteurs);
+      },
+      closeDialog(showDialog){
+        this.showDialog=showDialog;
+        console.log(this.showDialog);
       }
     }
 

@@ -1,7 +1,5 @@
 
 <template>
-  <div id="app">
-    <button @click="dialogModel=true">test</button>
     <v-dialog
         v-model="dialogModel"
         scrollable
@@ -20,28 +18,27 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialogModel = false"
+           @click="$emit('showDialog',this.dialogModel=false)"
           >
             Close
           </v-btn>
           <v-btn
             color="blue darken-1"
             text
-            @click="dialogModel = false"
+            @click="$emit('showDialog',this.dialogModel=false)"
           >
             Save
           </v-btn>
         </v-card-actions>
       </v-card>
       </v-dialog>  
-  </div>
 </template>
 <script>
   export default {
     props:['showDialog','Enum'],
     data () {
       return {
-       dialogModel: false,
+       dialogModel: this.showDialog,
       selectedActors : [],
         allActors :[
           {text:"Leonardo Decaprio",value:1},
@@ -63,9 +60,6 @@
       }
     },
      methods:{
-       test(){
-         console.log("parent",this.Enum)
-       }
     }
   }
 </script>
