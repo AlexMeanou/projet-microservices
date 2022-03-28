@@ -1,4 +1,5 @@
 # Libraries
+from cmath import log
 from multiprocessing.pool import ThreadPool
 from pymongo import MongoClient
 from urllib import request
@@ -43,6 +44,11 @@ def download_files(path = "tmp"):
 
 def import_rating(ratings_file): 
     client = MongoClient()
+    try:
+        MONGO_URL = os.environ['MONGODB_CONNSTRING']
+        client = MongoClient(MONGO_URL)
+    except KeyError:
+        pass
     db = client.wtwt
     movies = db.movies
 
@@ -76,6 +82,17 @@ def delete_files(path = "tmp"):
         print('Error deleting directory')
 
 if __name__ == '__main__':
-    download_files()
-    import_files_in_mongodb()
-    delete_files()
+    # download_files()
+    # import_files_in_mongodb()
+    # delete_files()
+    client = MongoClient()
+    try:
+        MONGO_URL = os.environ['MONGODB_CONNSTRING']
+        client = MongoClient(MONGO_URL)
+    except KeyError as e:
+        print(e)
+        pass
+    db = client.wtwt
+    movies = db.movies
+    # test = movies.find({"_id":"tt0000023"}).limit(5)
+    # print(list(test))

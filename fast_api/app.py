@@ -1,10 +1,13 @@
 # from functions import *
 from tokenize import String
-from fastapi import FastAPI, responses
+from fastapi import FastAPI, Request, responses
 import sys
+from pymongo import MongoClient
+import os
+
 sys.path.append("/home/eisti/Document/ING3/projet-microservices/fast_api")
 import requests
-from bdd.mongo import movies
+# from bdd.mongo import movies
 
  
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +31,24 @@ tags_metadata = [
         "description": "Truc"
     },
 ]
+
+client = MongoClient()
+
+try:
+    MONGO_URL = os.environ['MONGODB_CONNSTRING']    
+    # MONGO_URL = "mongodb://toto:tata@localhost:27017/"
+
+    client = MongoClient(MONGO_URL)
+    print("BDD OK !", MONGO_URL)
+except KeyError as e:
+    print(e)
+    pass
+
+db = client.wtwt
+movies = db.movies
+people = db.people
+
+
 
 app = FastAPI(openapi_tags=tags_metadata)
 
@@ -54,7 +75,7 @@ async def movie_by_genre(genre):
     # print(res.json())
     return res.json()
 
-@app.get('movie/popular', tags=['movie-popular'])
+@app.get('/movie/popular', tags=['movie-popular'])
 async def get_popular_movie():
     res = get_popular_movies_imdb()
     return res.json()
@@ -74,6 +95,20 @@ async def movie_by_id(id):
     res = get_movie_by_id(id=id)
     # print(res.json())
     return res.json()
+
+@app.post('/movie', tags=['movie'])
+async def insert_movie(data : Request):
+    movie = await data.json()
+    print(movie)
+    insert_id = str(movies.insert_one(movie).inserted_id)
+    return {"data":insert_id}
+
+@app.get('/movies', tags=['movies'])
+async def get_movies():
+    data = movies.find({},{"_id" : 0})
+    print(list(data))
+    return [x for x in movies.find({},{"_id" : 0}).limit(10)]
+
 
 @app.get("/genres/")
 async def genres():

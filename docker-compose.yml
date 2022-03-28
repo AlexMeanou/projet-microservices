@@ -1,17 +1,29 @@
 services:
-  microservices:
-    build: .
-    environment: 
-      - MONGODB_CONNSTRING=mongodb://toto:tata@mongodb
+  vue:
+    build:
+      context: ./front/wtwt
+      dockerfile: Dockerfile
     ports:
-      - 8585:8585
+      - 8080:8080
+
   mongodb:
     image: mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=toto
       - MONGO_INITDB_ROOT_PASSWORD=tata
     volumes:
-      - storage:/data/bd
+      - storage2:/data/bd
+    command: mongod
+
+  api:
+    build: 
+        context: ./fast_api
+        dockerfile: Dockerfile
+    environment: 
+      - MONGODB_CONNSTRING=mongodb://toto:tata@mongodb:27017
+    ports:
+      - 8585:8585
+      
 volumes:
-  storage:
+  storage2:
     external: true

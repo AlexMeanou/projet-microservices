@@ -1,0 +1,1 @@
+mongoimport --db {database} --collection {collection_name} --type tsv --file {name_file} --headerline
