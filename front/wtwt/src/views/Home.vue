@@ -109,16 +109,17 @@ export default{
     },
     changePage(){
       console.log("filerList",this.filterList);
-      // this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-      // console.log("page numero",this.page);
-      //  this.axios.get('http://127.0.0.1:8000/movies/' + this.page)
-      // .then(response =>{
-      //   this.movies = response.data
-      //   console.log(this.movies)
-      // } );
+      this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+      console.log("page numero",this.page);
+       this.axios.get('http://localhost:8585/movies/Short/' + this.page)
+      .then(response =>{
+        this.movies = response.data
+        console.log(this.movies)
+      } );
     }
   }
 }
+
 </script>
 
 <style scoped lang="scss">
