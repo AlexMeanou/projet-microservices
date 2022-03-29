@@ -1,4 +1,5 @@
 # Libraries
+from cmath import log
 from multiprocessing.pool import ThreadPool
 from pymongo import MongoClient
 from urllib import request
@@ -43,6 +44,12 @@ def download_files(path = "tmp"):
 
 def import_rating(ratings_file): 
     client = MongoClient()
+    try:
+        MONGO_URL = 'mongodb://root:tata@localhost:27017'
+        print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz   Bien connecte a la BDD')
+        client = MongoClient(MONGO_URL)
+    except KeyError:
+        pass
     db = client.wtwt
     movies = db.movies
 
@@ -60,14 +67,14 @@ def import_files_in_mongodb(path = "tmp", database = 'wtwt'):
         if remplace : 
             com = f"sed -i 's/{el[0]}/{el[1]}/g' {name_file}"
             os.system(com)
-        com = f"mongoimport --db {database} --collection {collection_name} --type tsv --file {name_file} --headerline"
+        com = f"mongoimport --uri mongodb://root:tata@localhost:27017/wtwt --collection {collection_name} --type tsv --file {name_file} --headerline --stopOnError --verbose --authenticationDatabase admin"
         os.system(com)
+    # --host localhost --port 27017 --username toto --password 'tata' --db {database} 
+    import_tsv_mongodb(os.path.join(path, "dataNameSample.tsv"), "people", remplace=True, el= ["nconst", "_id"])
+    import_tsv_mongodb(os.path.join(path, "dataTitleSample.tsv"), "movies", remplace=True, el= ["tconst", "_id"])
+    import_tsv_mongodb(os.path.join(path, "dataPrincipalSample.tsv"), "link_people_movies")
     
-    import_tsv_mongodb(os.path.join(path, "name.basics.tsv"), "pepole", remplace=True, el= ["nconst", "_id"])
-    import_tsv_mongodb(os.path.join(path, "title.basics.tsv"), "movies", remplace=True, el= ["tconst", "_id"])
-    import_tsv_mongodb(os.path.join(path, "title.principals.tsv"), "link_people_movies")
-    
-    import_rating(os.path.join(path, "title.ratings.tsv"))
+    import_rating(os.path.join(path, "dataRatingsSample.tsv"))
 
 def delete_files(path = "tmp"):
     try:
@@ -76,6 +83,17 @@ def delete_files(path = "tmp"):
         print('Error deleting directory')
 
 if __name__ == '__main__':
-    download_files()
+    # download_files()
     import_files_in_mongodb()
-    delete_files()
+    # delete_files()
+    # client = MongoClient()
+    # try:
+    #     MONGO_URL = os.environ['MONGODB_CONNSTRING']
+    #     client = MongoClient(MONGO_URL)
+    # except KeyError as e:
+    #     print(e)
+    #     pass
+    # db = client.wtwt
+    # movies = db.movies
+    # test = movies.find({"_id":"tt0000023"}).limit(5)
+    # print(list(test)) 15:12

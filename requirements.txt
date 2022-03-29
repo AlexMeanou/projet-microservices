@@ -1,3 +1,10 @@
 pymongo
 FastApi[all]
 uvicorn
+multiprocessing
+urllib
+shutil
+gzip
+csv
+re
+os

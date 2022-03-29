@@ -14,8 +14,12 @@ RUN python3.8 -m pip install --upgrade pip
 
 RUN python3.8 -m pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# 
-COPY ./imdb_api /code/app
 
 # 
-CMD ["uvicorn", "app.imdb_api:app", "--host", "0.0.0.0", "--port", "80"]
+COPY . /code/app
+
+ENV PYTHONPATH "${PYTHONPATH}:/code/app"
+
+# RUN python3.8 /code/app/bdd/mongo-init.py
+# 
+CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8585"]

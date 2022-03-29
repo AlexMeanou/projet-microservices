@@ -1,0 +1,32 @@
+services:
+  # vue:
+  #   build:
+  #     context: ./front/wtwt
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8080:8080
+
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=tata
+    ports:
+      - 27017:27017
+    volumes:
+      - ./fast_api/bdd/storage/:/data/db
+    command: mongod
+
+  api:
+    build: 
+        context: ./fast_api
+        dockerfile: Dockerfile
+    environment: 
+        # - MONGODB_CONNSTRING=mongodb://mongodb:27017
+      - MONGODB_CONNSTRING=mongodb://root:tata@mongodb:27017
+    ports:
+      - 8585:8585
+      
+# volumes:
+#   storage:
+#     external: true
