@@ -4,6 +4,10 @@ mongodb/__pycache__/
 mongodb/data/
 mongodb/BDD/
 
+fast_api/__pycache__
+fast_api/bdd/__pycache__
+fast_api/bdd/storage
+
 front/wtwt/.DS_Store
 front/wtwt/node_modules
 front/wtwt/dist
