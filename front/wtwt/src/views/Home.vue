@@ -30,7 +30,13 @@
     </nav>
 
     <div class="container">
-      <vertical-menu class="col" @langues="selectLangues($event)" @acteurs="selectActeurs($event)"/>
+      <vertical-menu class="col" 
+        @langues="selectLangues($event)"
+        @acteurs="selectActeurs($event)"
+        @isAdult="selectAdult($event)"
+        @notes="selectNotes($event)"
+        @nbVotes="selectVotes($event)"/>
+
       <div class="grid-container col">
         <film-grid :movies="movies" :filterMovies="filterMovies"/>
         <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
@@ -57,6 +63,9 @@ export default{
         genre : 0,
         langues : [],
         acteurs : [],
+        isAdult:false,
+        notes : [],
+        nbVotes : 0,
       },
       page : 1,
       movies,
@@ -84,11 +93,23 @@ export default{
       this.filter();
     },
     selectActeurs(acteurs){
-      this.filterList.acteurs=acteurs;
-   
-     
+      this.filterList.acteurs=acteurs; 
+      this.filter();
+    },
+    selectNotes(notes){
+      this.filterList.notes=notes; 
+      this.filter();
+    },
+    selectVotes(nbVotes){
+      this.filterList.nbVotes=nbVotes; 
+      this.filter();
+    },
+    selectAdult(isAdult){
+      this.filterList.isAdult=isAdult; 
+      this.filter();
     },
     filter(){
+      console.log("filter",this.filterList);
       this.filterMovies = this.movies.filter(x=>{
         if (this.filterList.genre!==Enum.genre.TOUS){
             return x.genres==this.filterList.genre

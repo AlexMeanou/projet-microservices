@@ -61,7 +61,6 @@ export default {
           console.log("connexion reussie");
           localStorage.name=this.name;
           this.$router.push('/');
-          this.$router.go();
         }
         else{
           this.loginError=true;
