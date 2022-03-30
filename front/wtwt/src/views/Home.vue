@@ -38,6 +38,7 @@
         @nbVotes="selectVotes($event)"/>
 
       <div class="grid-container col">
+        {{movies}}
         <film-grid :movies="movies" :filterMovies="filterMovies"/>
         <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
       </div>
@@ -47,7 +48,7 @@
 
 <script> 
 import FilmGrid from '../components/FilmGrid.vue';
-import movies from '../assets/data/movies'
+// import movies from '../assets/data/movies'
 import VerticalMenu from '../components/VerticalMenu.vue';
 import Enum from "../utils/enum"
 export default{
@@ -68,12 +69,14 @@ export default{
         nbVotes : 0,
       },
       page : 1,
-      movies,
-      filterMovies:movies,
+      movies : [],
+      filterMovies: [],
       selectedGenre : "",
     }
   },
   mounted(){
+    this.changePage()
+    console.log("licorne", this.movies)
   },
   methods: {
     clickOnGenre(genreId) {
@@ -132,11 +135,7 @@ export default{
       console.log("filerList",this.filterList);
       this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
       console.log("page numero",this.page);
-<<<<<<< HEAD
-       this.axios.get('http://127.0.0.1:51414/movies/' + this.page)
-=======
        this.axios.get('http://localhost:8585/movies/Short/' + this.page)
->>>>>>> 88d88aa5e3c1abf499a1784368937ac1c9ff42bc
       .then(response =>{
         this.movies = response.data
         console.log(this.movies)

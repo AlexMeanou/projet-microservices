@@ -37,6 +37,9 @@ export default {
             showDialog:false,
         }
     },
+    mounted(){
+        console.log("coucou", this.movies)
+    }, 
     methods:{
        goToFilm(){
            let url = '/film/';

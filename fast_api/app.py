@@ -136,18 +136,18 @@ async def get_movie_by_genre_and_page_number(genre, page:int):
     return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
 
-# @app.get("/movies/{page}")
-# async def get_all_movies_by_page(page : int):
-#     page -= 1
-#     l_movies = []
-#     for movie in movies.find().sort("averageRating").skip(page * 10).limit(10):
-#         if not is_enough_for_home_page(movie): 
-#             refersh_movie_data(movie['_id'])
-#             new_data_movie = movies.find({"_id" : movie['_id']})
-#             l_movies.append(new_data_movie)
-#         else : 
-#             l_movies.append(movie)
-#     return l_movies
+@app.get("/movies/{page}")
+async def get_all_movies_by_page(page : int):
+    page -= 1
+    l_movies = []
+    for movie in movies.find().sort("averageRating").skip(page * 10).limit(10):
+        if not is_enough_for_home_page(movie): 
+            refersh_movie_data(movie['_id'])
+            new_data_movie = movies.find({"_id" : movie['_id']})
+            l_movies.append(new_data_movie)
+        else : 
+            l_movies.append(movie)
+    return l_movies
 
 # @app.get("/movies/{genre}/{page}")
 # async def get_all_movies_by_page(genre : str, page : int):
