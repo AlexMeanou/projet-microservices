@@ -5,6 +5,7 @@ import Inscription from "../views/Inscription";
 import Preferences from "../views/Preferences";
 import Groupe from "../views/Groupe";
 import Film from "../views/Film";
+import LoginVue from '@/views/Login.vue';
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/inscription',
     name: 'Inscription',
     component: Inscription
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginVue
   }
 ]
 
