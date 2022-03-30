@@ -5,11 +5,13 @@ import vuetify from './plugins/vuetify'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import { loadFonts } from './plugins/webfontloader'
+import store from './store'
 
 loadFonts()
 
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .use(VueAxios,axios)
-  .mount('#app')
+const app = createApp(App)
+app.use(router);
+app.use(store);
+app.use(vuetify);
+app.use(VueAxios,axios);
+app.mount('#app');
