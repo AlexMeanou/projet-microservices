@@ -17,11 +17,11 @@
         "tt0000015",
         "tt0000023"
         ],
-    "genres" : [
-        "Animation",
-        "Action",
-        "Drama"
-    ],
+    "genres" : {
+        "Animation": 2, 
+        "Action": 8, 
+        "Drama": 1    
+    }, 
     "celebrities" : [
         "Leonardo Di Caprio",
         "Quentin Tarentino",

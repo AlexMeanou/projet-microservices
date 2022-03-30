@@ -2,21 +2,40 @@
 <template>
 <div class="inscription">
   <div class="form-group">
-    <h2 class="title">Inscrivez vous !</h2>
-    <div>
-      <label for="name">nom</label>
-      <input class="form-control" type="text" v-model="name" id="name">
-      <div v-if="!isNameExists()" class="invalid"> Entrez un nom !</div>
+    <div v-if="numPage==1" class="step-1">
+      <h2 class="title">Inscrivez vous !</h2>
+      <div>
+        <label for="name">nom</label>
+        <input class="form-control" type="text" v-model="name" id="name">
+        <div v-if="!isNameExists()" class="invalid"> Entrez un nom !</div>
+      </div>
+      <div>
+        <label for="password">mot de passe</label>
+        <input class="form-control" type="password" v-model="password" id="password">
+      </div>
+      <div>
+        <label for="password">confirmer le mot de passe</label>
+        <input class="form-control" type="password" v-model="password2" id="password2">
+      </div>
     </div>
-    <div>
-      <label for="password">mot de passe</label>
-      <input class="form-control" type="password" v-model="password" id="password">
+
+    <div v-if="numPage==2" class="step-2">
+      <h2 class="title">Vos préférences !</h2>
+      <div>
+        <label for="name">test</label>
+        <input class="form-control" type="text" v-model="name" id="name">
+      </div>
+      <div>
+        <label for="password">test</label>
+        <input class="form-control" type="password" v-model="password" id="password">
+      </div>
+      <div>
+        <label for="password">test</label>
+        <input class="form-control" type="password" v-model="password2" id="password2">
+      </div>
     </div>
-     <div>
-      <label for="password">confirmer le mot de passe</label>
-      <input class="form-control" type="password" v-model="password2" id="password2">
-    </div>
-    <button type="submit" class="btn btn-primary" :disabled="!isValid()" @click="subscribe()">S'inscrire</button>
+    <button v-if="numPage==1" type="submit" class="btn btn-primary" :disabled="!isForm2Valid()" @click="numPage++">Continuer</button>
+     <button v-else type="submit" class="btn btn-primary" :disabled="!isForm2Valid()" @click="subscribe()">S'inscrire</button>
     <p>Déja inscrit ? <a class="link"><router-link to="/connexion">Se connecter</router-link></a> </p>
     <div v-if="!isPasswordsEqual() && password && password2" class="alert alert-danger" role="alert"> Les mots de passes ne correspondent pas !</div>
   </div>
@@ -43,6 +62,7 @@ export default {
             name: '',
             password: '',
             password2: '',
+            numPage:1,
         }
     },
     methods:{
@@ -56,8 +76,11 @@ export default {
             return true;
             // on parcourt l'ensemble des noms de la bdd et on regarde si le nom est identique à l'un d'entre eux
         },
-        isValid(){
+        isForm1Valid(){
             return this.isNotEmpty() && this.isPasswordsEqual() && this.isNameExists();
+        },
+        isForm2Valid(){
+            return true;
         },
         subscribe(){
             console.log("on inscrit l'utilisteur avec le nom et son password")

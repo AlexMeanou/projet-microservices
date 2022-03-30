@@ -4,12 +4,18 @@ import Connexion from "../views/Connexion";
 import Inscription from "../views/Inscription";
 import Preferences from "../views/Preferences";
 import Groupe from "../views/Groupe";
+import Film from "../views/Film";
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/film/:id?',
+    name: 'Film',
+    component: Film
   },
   {
     path: '/preferences',

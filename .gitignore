@@ -32,3 +32,4 @@ front/wtwt/pnpm-debug.log*
 *.sln
 *.sw?
 
+.env/
