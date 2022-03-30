@@ -20,7 +20,7 @@ def jwt_auth(req : Request):
         except Exception as e:
             raise(e)
 
-        return {}
+        return None
     else:
         return {
                 "error": {

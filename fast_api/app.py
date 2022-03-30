@@ -188,7 +188,8 @@ async def login(body: User):
 
             return {
                 "data": {
-                    "token" : token
+                    "token" : token,
+                    'username' : body.username
                 }
             }
         else:
