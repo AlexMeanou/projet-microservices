@@ -1,9 +1,13 @@
 # from functions import *
+from lib2to3.pgen2.tokenize import generate_tokens
 from tokenize import String
-from fastapi import FastAPI, Request, responses
+from fastapi import FastAPI, HTTPException, Request
 import sys
 from pymongo import MongoClient
 import os
+from passlib.hash import sha256_crypt
+import jwt
+import datetime
 
 sys.path.append("/home/eisti/Document/ING3/projet-microservices/fast_api")
 import requests
@@ -47,6 +51,7 @@ except KeyError as e:
 db = client.wtwt
 movies = db.movies
 people = db.people
+users = db.users
 
 
 
@@ -117,10 +122,12 @@ async def genres():
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
 @app.get("/borne_note/")
-async def borne_note():
-    import itertools
-    vote = set([int(m.get('numVotes', 0)) for m in movies.find({},{ "numVotes": 1 , "_id" : 0}).limit(100000)])
-    return [min(vote), max(vote)]
+async def borne_note(req : Request):
+    is_autorized = verify_token(req)
+    if is_autorized:
+        import itertools
+        vote = set([int(m.get('numVotes', 0)) for m in movies.find({},{ "numVotes": 1 , "_id" : 0}).limit(100000)])
+        return [min(vote), max(vote)]
     
 
 @app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}")
@@ -134,6 +141,61 @@ async def get_movie_by_genre_and_page_number(genre, page:int):
     # limite = page * 10
     skip = page - 1
     return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+
+@app.post("/user/register/")
+async def create_user(username, password):
+    hash_password = generate_hash(password)
+    res = users.insert_one({
+        "username" : username,
+        "password" : hash_password,
+    })
+
+    user_id = str(res.inserted_id) # TODO : pas besoin pour l'instant mais ca peut vous aider si besoin
+
+
+    token = encode_auth_token({
+        "username": username,
+        "password": password,
+        "user_id": user_id
+    })
+
+    return {"token" : token}
+
+@app.post("/user/login/")
+async def login(username, password):
+    user = users.find_one({'username':username}) # TODO : il faut récupérer le password du user qui est le hash dans le bdd
+
+    if user:
+        hash = user.password
+        if verify_hash(password, hash):
+            token = encode_auth_token({
+                "username": username,
+                "password": password,
+                "user_id": str(user._id)
+            })
+
+            return {
+                "data": {
+                    "token" : token
+                }
+            }
+        else:
+            return {
+                "error" : {
+                    "code" : 403,
+                    "message" : "Mot de passe incorrect"
+                }
+            }
+    else:
+        return {
+                "error" : {
+                    "code" : 403,
+                    "message" : "Username incorrect"
+                }
+            }
+
+
+
 
 
 # @app.get("/movies/{page}")
@@ -188,6 +250,53 @@ def is_enough_for_home_page(data):
     image = data.get("image", None) != None
     return image
 
+def encode_auth_token(payload):
+    """
+    Generates the Auth Token
+    :return: string
+    """
+
+    return jwt.encode(
+        payload,
+        'zefjzef3421Rhréhdzjefd34é',
+        algorithm='HS256'
+    )
+
+def generate_hash(password):
+    return sha256_crypt.hash(password)    
+
+def verify_hash(password, hash):
+    return sha256_crypt.verify(password, hash)
+
+
+def decode_auth_token(auth_token):
+    """
+    Decodes the auth token
+    :param auth_token:
+    :return: integer|string
+    """
+    try:
+        payload = jwt.decode(auth_token, 'zefjzef3421Rhréhdzjefd34é', algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError as e1:
+        raise e1
+    except jwt.InvalidTokenError as e2:
+        raise e2
+
+def verify_token(req: Request):
+    # Here your code for verifying the token or whatever you use
+    try :
+        token = req.headers["Authorization"]
+        username = decode_auth_token(token)
+    except jwt.exceptions.InvalidTokenError:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+    except Exception as e:
+        raise(e)
+
+    return True
 
 # def getMoviesListID(idList : list):
 #     res = []
@@ -222,3 +331,4 @@ def is_enough_for_home_page(data):
 #         ]
 #         )
 #     return res.json()
+
