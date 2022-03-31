@@ -1,14 +1,14 @@
 # from functions import *
-from lib2to3.pgen2.tokenize import generate_tokens
 from tokenize import String
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 import sys
 from pydantic import BaseModel
 from pymongo import MongoClient
 import os
 from passlib.hash import sha256_crypt
 import jwt
-import datetime
+
+from tools import jwt_auth
 
 sys.path.append("/home/eisti/Document/ING3/projet-microservices/fast_api")
 import requests
@@ -86,11 +86,18 @@ async def get_popular_movie():
     res = get_popular_movies_imdb()
     return res.json()
 
+# @jwt_auth
 @app.get("/movies/{genre}/{page}", tags=['mongo'])
-async def get_movie_by_genre_and_page_number(genre, page:int):
-    # limite = page * 10
-    skip = page - 1
-    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+async def get_movie_by_genre_and_page_number(genre, page:int, request: Request):
+    print('get_movie_by_genre_and_page_number')
+    # print(request)
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        # limite = page * 10
+        skip = page - 1
+        return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
 @app.get("/oneMovie/{movie_id}", tags=['mongo'])
 async def get_one_by_id(movie_id: str):
@@ -183,7 +190,7 @@ async def create_user(body: User):
         "password" : hash_password,
     })
 
-    user_id = str(res.inserted_id) # TODO : pas besoin pour l'instant mais ca peut vous aider si besoin
+    user_id = str(res.inserted_id) 
 
 
     token = encode_auth_token({
@@ -197,7 +204,6 @@ async def create_user(body: User):
 @app.post("/user/login/", tags=['user'])
 async def login(body: User):
     user = users.find_one({'username':body.username}) # TODO : il faut récupérer le password du user qui est le hash dans le bdd
-    print("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
     # print(user["password"])
     if user:
         hash = user["password"]
@@ -210,7 +216,8 @@ async def login(body: User):
 
             return {
                 "data": {
-                    "token" : token
+                    "token" : token,
+                    'username' : body.username
                 }
             }
         else:
@@ -272,36 +279,6 @@ def generate_hash(password):
 
 def verify_hash(password, hash):
     return sha256_crypt.verify(password, hash)
-
-
-def decode_auth_token(auth_token):
-    """
-    Decodes the auth token
-    :param auth_token:
-    :return: integer|string
-    """
-    try:
-        payload = jwt.decode(auth_token, 'zefjzef3421Rhréhdzjefd34é', algorithms=['HS256'])
-        return payload
-    except jwt.ExpiredSignatureError as e1:
-        raise e1
-    except jwt.InvalidTokenError as e2:
-        raise e2
-
-def verify_token(req: Request):
-    # Here your code for verifying the token or whatever you use
-    try :
-        token = req.headers["Authorization"]
-        username = decode_auth_token(token)
-    except jwt.exceptions.InvalidTokenError:
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
-    except Exception as e:
-        raise(e)
-
-    return True
 
 # def getMoviesListID(idList : list):
 #     res = []

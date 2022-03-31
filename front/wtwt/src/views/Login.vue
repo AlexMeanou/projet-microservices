@@ -77,16 +77,16 @@ export default {
           username : this.userLogin.username,
           password : this.userLogin.password
         }
-      }).then((result) => {
-        console.log("result : ",result.error);
-        if (result.error?.code === 403)
+      }).then(() => {
+        this.$router.push({name:"Home"})
+      }).catch(
+        (err) => {
           this.errorAtLogin = {
-            code : result.status,
-            message : result.message
+            code : err.code,
+            message : err.message
           }
-        else 
-          this.$router.push({name:"Home"})
-      })
+        }
+      )
     },
     register() {
       this.$store.dispatch('register', {

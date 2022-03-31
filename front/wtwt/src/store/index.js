@@ -9,7 +9,6 @@ export default new Vuex.Store({
     state: {
         user : {
             username : "",
-            password : "",
             token : ""
         },
         movies : [
@@ -120,18 +119,16 @@ export default new Vuex.Store({
           password : payload.user.password
         }
   
-        const res = await axios.post(url, body)
-        console.log(res);
-        if (res.data.code === 200) {
+        const res = (await axios.post(url, body)).data
+        if (res.data) {
           const user = {
-            username : res.data.data.user.username,
-            password : res.data.data.user.password,
-            token : res.data.data.token,
+            username : res.data.username,
+            token : res.data.token,
           }
-          console.log(user)
           state.commit('setUser', user)
+          return user
         } else {
-          return res.data
+          return Promise.reject(res.error)
         }
       },
       async register(state, payload) {
