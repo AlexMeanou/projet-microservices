@@ -2,10 +2,35 @@
 
 <template>
 <div>
-    <div>Username</div>
-    <input type="text" (value)="username">
-    <div>password</div>
-    <input type="passwword" (value)="password">
+  <div style="margin-top:5em;"> Se connecter 
+    <form @submit.prevent="login">
+      <div>Username</div>
+      <input type="text" v-model="userLogin.username">
+      <div>password</div>
+      <input type="password" v-model="userLogin.password">
+      <div v-if="errorAtLogin.code !== 200">
+        <p>{{ errorAtLogin.message }}</p>
+      </div>
+      <div>
+        <button type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+
+  <div style="margin-top:5em;"> S'enregistrer
+    <form @submit.prevent="register">
+      <div>Username</div>
+      <input type="text" v-model="userRegister.username">
+      <div>password</div>
+      <input type="password" v-model="userRegister.password">
+      <div v-if="errorAtRegister.code !== 200">
+        <p>{{ errorAtRegister.message }}</p>
+      </div>
+      <div>
+        <button type="submit">Register</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 </template>
@@ -17,28 +42,68 @@ export default {
   },
   data(){
     return {
-        username:"toto",
-        password: 'tata',
-        loginError: false
+      userLogin: {
+        username:'',
+        password: '',
+      },
+      userRegister: {
+        username:'',
+        password: '',
+      },
+      loginError: false,
+      registerBool: false,
+      errorAtLogin: {
+        code: 200,
+        message: ""
+      },
+      errorAtRegister: {
+        code: 200,
+        message: ""
+      }
+    }
+  },
+  computed: {
+    isLogged() {
+      return this.$store.getters.isLogged;
     }
   },
   methods:{
     isFormValid() {
         return true // TODO : Vérifier si il y a bien un pwd et un username dans l'input
     },
-    login(){
-      if(this.isFormValid()){
-          this.$storage.user
-        if(this.isLoginCorrect()){
-          console.log("connexion reussie");
-          localStorage.name=this.name;
-          this.$router.push('/');
-          this.$router.go();
+    login() {
+      this.$store.dispatch('login', {
+        user : {
+          username : this.userLogin.username,
+          password : this.userLogin.password
         }
-        else{
-          this.loginError=true;
+      }).then(() => {
+        this.$router.push({name:"Home"})
+      }).catch(
+        (err) => {
+          this.errorAtLogin = {
+            code : err.code,
+            message : err.message
+          }
         }
-      }
+      )
+    },
+    register() {
+      this.$store.dispatch('register', {
+        user : {
+          username : this.userRegister.username,
+          password : this.userRegister.password
+        }
+      }).then((result) => {
+        if (result.status === 200) {
+          this.registerBool = true
+        } else {
+          this.errorRegister = {
+            code : result.status,
+            message : result.message
+          }
+        }
+      });
     }
   }
 }

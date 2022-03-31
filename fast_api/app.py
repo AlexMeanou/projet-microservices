@@ -1,13 +1,14 @@
 # from functions import *
-from lib2to3.pgen2.tokenize import generate_tokens
 from tokenize import String
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 import sys
+from pydantic import BaseModel
 from pymongo import MongoClient
 import os
 from passlib.hash import sha256_crypt
 import jwt
-import datetime
+
+from tools import jwt_auth
 
 sys.path.append("/home/eisti/Document/ING3/projet-microservices/fast_api")
 import requests
@@ -23,16 +24,16 @@ tags_metadata = [
         "description": "Bienvenue sur le site de moi et moi meme",
     },
     {
-        "name": "movie-genre",
-        "description": "Voir tous les genres de films disponible."
+        "name": "mongo",
+        "description": "On tape sur la bdd"
     },
     {
-        "name": "movie-popular",
-        "description": "Voir tous les films les plus populaires ."
+        "name": "imdb",
+        "description": "On tape sur l'api IMDB"
     },
     {
-        "name": "movies-genre-page",
-        "description": "Truc"
+        "name": "mongo-test",
+        "description": "Entrainement et test sur mongo"
     },
 ]
 
@@ -74,54 +75,61 @@ async def root():
     return {"message" : "Best app ever !"}
 
 
-@app.get('/movie/genre', tags=['movie-genre'])
+@app.get('/movie/genre', tags=['imdb'])
 async def movie_by_genre(genre):
     res = get_movie_by_genre(genre=genre)
     # print(res.json())
     return res.json()
 
-@app.get('/movie/popular', tags=['movie-popular'])
+@app.get('/movie/popular', tags=['imdb'])
 async def get_popular_movie():
     res = get_popular_movies_imdb()
     return res.json()
 
-@app.get("/movies/{genre}/{page}", tags=['movies-genre-page'])
-async def get_movie_by_genre_and_page_number(genre, page:int):
-    # limite = page * 10
-    skip = page - 1
-    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+# @jwt_auth
+@app.get("/movies/{genre}/{page}", tags=['mongo'])
+async def get_movie_by_genre_and_page_number(genre, page:int, request: Request):
+    print('get_movie_by_genre_and_page_number')
+    # print(request)
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        # limite = page * 10
+        skip = page - 1
+        return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
-@app.get("/oneMovie/{movie_id}")
+@app.get("/oneMovie/{movie_id}", tags=['mongo'])
 async def get_one_by_id(movie_id: str):
     return [ a for a in movies.find({"_id" : movie_id})]
 
-@app.get('/movie/detail/{id}')
+@app.get('/movie/detail/{id}', tags=['imdb'])
 async def movie_by_id(id):
     res = get_movie_by_id(id=id)
     # print(res.json())
     return res.json()
 
-@app.post('/movie', tags=['movie'])
+@app.post('/movie/insert', tags=['mongo-test'])
 async def insert_movie(data : Request):
     movie = await data.json()
     print(movie)
     insert_id = str(movies.insert_one(movie).inserted_id)
     return {"data":insert_id}
 
-@app.get('/movies', tags=['movies'])
+@app.get('/movie', tags=['mongo-test'])
 async def get_movies():
     data = movies.find({},{"_id" : 0})
     print(list(data))
     return [x for x in movies.find({},{"_id" : 0}).limit(10)]
 
 
-@app.get("/genres/")
+@app.get("/genres/", tags=['mongo'])
 async def genres():
     import itertools
     return len(set(list(itertools.chain(*[ m['genres'].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(100000)]))))
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
-@app.get("/borne_note/")
+@app.get("/borne_note/", tags=['mongo'])
 async def borne_note(req : Request):
     is_autorized = verify_token(req)
     if is_autorized:
@@ -130,53 +138,58 @@ async def borne_note(req : Request):
         return [min(vote), max(vote)]
     
 
-@app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}")
+@app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}", tags=['mongo'])
 async def get_movie_by_genre_and_page_number(genre, page:int):
     # limite = page * 10
     skip = page - 1
     return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
-@app.get("/movies/{mot_clef}")
+@app.get("/movies/{mot_clef}", tags=['mongo'])
 async def get_movie_by_genre_and_page_number(genre, page:int):
     # limite = page * 10
     skip = page - 1
     return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
-@app.post("/user/register/")
-async def create_user(username, password):
-    hash_password = generate_hash(password)
+class User(BaseModel):
+    username : str
+    password : str
+
+@app.post("/user/register/", tags=['user'])
+async def create_user(body: User):
+    hash_password = generate_hash(body.password)
     res = users.insert_one({
-        "username" : username,
+        "username" : body.username,
         "password" : hash_password,
     })
 
-    user_id = str(res.inserted_id) # TODO : pas besoin pour l'instant mais ca peut vous aider si besoin
+    user_id = str(res.inserted_id) 
 
 
     token = encode_auth_token({
-        "username": username,
-        "password": password,
+        "username": body.username,
+        "password": body.password,
         "user_id": user_id
     })
 
     return {"token" : token}
 
-@app.post("/user/login/")
-async def login(username, password):
-    user = users.find_one({'username':username}) # TODO : il faut récupérer le password du user qui est le hash dans le bdd
-
+@app.post("/user/login/", tags=['user'])
+async def login(body: User):
+    user = users.find_one({'username':body.username}) # TODO : il faut récupérer le password du user qui est le hash dans le bdd
+    # print(user["password"])
     if user:
-        hash = user.password
-        if verify_hash(password, hash):
+        hash = user["password"]
+        if verify_hash(body.password, hash):
             token = encode_auth_token({
-                "username": username,
-                "password": password,
-                "user_id": str(user._id)
+                "username": body.username,
+                "password": body.password,
+                "user_id": str(user["_id"])
             })
 
             return {
                 "data": {
-                    "token" : token
+                    "token" : token,
+                    'username' : body.username
                 }
             }
         else:
@@ -193,36 +206,6 @@ async def login(username, password):
                     "message" : "Username incorrect"
                 }
             }
-
-
-
-
-
-# @app.get("/movies/{page}")
-# async def get_all_movies_by_page(page : int):
-#     page -= 1
-#     l_movies = []
-#     for movie in movies.find().sort("averageRating").skip(page * 10).limit(10):
-#         if not is_enough_for_home_page(movie): 
-#             refersh_movie_data(movie['_id'])
-#             new_data_movie = movies.find({"_id" : movie['_id']})
-#             l_movies.append(new_data_movie)
-#         else : 
-#             l_movies.append(movie)
-#     return l_movies
-
-# @app.get("/movies/{genre}/{page}")
-# async def get_all_movies_by_page(genre : str, page : int):
-#     page -= 1
-#     l_movies = []
-#     for movie in movies.find().skip(page * 10).limit(10):
-#         if not is_enough_for_home_page(movie): 
-#             refersh_movie_data(movie['_id'])
-#             new_data_movie = movies.find({"_id" : movie['_id']})
-#             l_movies.append(new_data_movie)
-#         else : 
-#             l_movies.append(movie)
-#     return l_movies
 
 
 
@@ -268,36 +251,6 @@ def generate_hash(password):
 def verify_hash(password, hash):
     return sha256_crypt.verify(password, hash)
 
-
-def decode_auth_token(auth_token):
-    """
-    Decodes the auth token
-    :param auth_token:
-    :return: integer|string
-    """
-    try:
-        payload = jwt.decode(auth_token, 'zefjzef3421Rhréhdzjefd34é', algorithms=['HS256'])
-        return payload
-    except jwt.ExpiredSignatureError as e1:
-        raise e1
-    except jwt.InvalidTokenError as e2:
-        raise e2
-
-def verify_token(req: Request):
-    # Here your code for verifying the token or whatever you use
-    try :
-        token = req.headers["Authorization"]
-        username = decode_auth_token(token)
-    except jwt.exceptions.InvalidTokenError:
-        raise HTTPException(
-            status_code=401,
-            detail="Unauthorized"
-        )
-    except Exception as e:
-        raise(e)
-
-    return True
-
 # def getMoviesListID(idList : list):
 #     res = []
 #     for id in idList:
@@ -332,3 +285,29 @@ def verify_token(req: Request):
 #         )
 #     return res.json()
 
+
+# @app.get("/movies/{page}")
+# async def get_all_movies_by_page(page : int):
+#     page -= 1
+#     l_movies = []
+#     for movie in movies.find().sort("averageRating").skip(page * 10).limit(10):
+#         if not is_enough_for_home_page(movie): 
+#             refersh_movie_data(movie['_id'])
+#             new_data_movie = movies.find({"_id" : movie['_id']})
+#             l_movies.append(new_data_movie)
+#         else : 
+#             l_movies.append(movie)
+#     return l_movies
+
+# @app.get("/movies/{genre}/{page}")
+# async def get_all_movies_by_page(genre : str, page : int):
+#     page -= 1
+#     l_movies = []
+#     for movie in movies.find().skip(page * 10).limit(10):
+#         if not is_enough_for_home_page(movie): 
+#             refersh_movie_data(movie['_id'])
+#             new_data_movie = movies.find({"_id" : movie['_id']})
+#             l_movies.append(new_data_movie)
+#         else : 
+#             l_movies.append(movie)
+#     return l_movies

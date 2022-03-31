@@ -59,6 +59,7 @@
 
         <div class="nav-bloc nb-vote">
           <div class="form-group" id="form-group">
+            
             <label class="form-label" for="form-group">Nombre de votes</label>
             <v-slider v-model="nbVotes" thumb-color="white" thumb-label="always" :max="255" class="align-center" style="margin-top:1.8rem" @click="$emit('nbVotes',nbVotes)"> </v-slider>
           </div>
