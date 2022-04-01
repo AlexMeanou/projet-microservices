@@ -23,6 +23,8 @@
       <input type="text" v-model="userRegister.username">
       <div>password</div>
       <input type="password" v-model="userRegister.password">
+      <div>Nom du group que vous souhaiter rejoindre ou créer à l'inscription</div>
+      <input type="text" v-model="userRegister.group">
       <div v-if="errorAtRegister.code !== 200">
         <p>{{ errorAtRegister.message }}</p>
       </div>
@@ -36,6 +38,7 @@
 </template>
 
 <script>
+import AppVue from "@/App.vue";
 export default {
   name: "Login",
   components :{
@@ -49,6 +52,7 @@ export default {
       userRegister: {
         username:'',
         password: '',
+        group: '',
       },
       loginError: false,
       registerBool: false,
@@ -69,7 +73,7 @@ export default {
   },
   methods:{
     isFormValid() {
-        return true // TODO : Vérifier si il y a bien un pwd et un username dans l'input
+        return (this.userRegister.username && this.userRegister.password && this.userRegister.group) != ""
     },
     login() {
       this.$store.dispatch('login', {
@@ -78,6 +82,7 @@ export default {
           password : this.userLogin.password
         }
       }).then(() => {
+        // AppVue.computed.key.set()
         this.$router.push({name:"Home"})
       }).catch(
         (err) => {
@@ -89,21 +94,32 @@ export default {
       )
     },
     register() {
-      this.$store.dispatch('register', {
-        user : {
-          username : this.userRegister.username,
-          password : this.userRegister.password
-        }
-      }).then((result) => {
-        if (result.status === 200) {
-          this.registerBool = true
-        } else {
-          this.errorRegister = {
-            code : result.status,
-            message : result.message
+      if (this.isFormValid()){
+        this.$store.dispatch('register', {
+          user : {
+            username : this.userRegister.username,
+            password : this.userRegister.password,
+            group: this.userRegister.group
           }
+        }).then((result) => {
+          console.log(result);
+          if (result.error?.code) {
+            this.errorAtRegister = {
+              code : result.error.code,
+              message : result.error.message
+            }
+          } else {
+            this.registerBool = true
+            AppVue.methods.forceRerender()
+          }
+        });
+      } else {
+        console.log("pas valide");
+        this.errorAtRegister = {
+          code : 400,
+          message : "Le formulaire n'est pas valide"
         }
-      });
+      }
     }
   }
 }

@@ -9,7 +9,7 @@
                     </svg>
                 </router-link>
             </a>
-            <a v-if="isLogin">
+            <a v-if="getLogged">
                 <router-link to='/groupe'>
                     <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
                         <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
@@ -18,14 +18,14 @@
                 </router-link>
             </a>
     
-             <a v-if="isLogin" class="preference-link">
+             <a v-if="getLogged" class="preference-link">
                  <router-link to="/preference">
                     <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
                         <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
                     </svg>
                  </router-link>
             </a>
-            <a v-if="!isLogin" class="connexion-link">
+            <a v-if="!getLogged" class="connexion-link">
                 <router-link to="/connexion">
                     Connexion
                     <!-- <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
@@ -34,7 +34,7 @@
                     </svg> -->
                 </router-link>
             </a>
-             <a v-if="isLogin" class="connexion-link" @click="logout()">
+             <a v-if="getLogged" class="connexion-link" @click="logout()">
                 <router-link to="/">
                     Deconnexion
                 </router-link>
@@ -48,20 +48,53 @@ export default {
     name: "Menu",
     data(){
         return {
-            isLogin :false
+            componentKey: 0,
+            // isLogged : false
         }
     },
     mounted(){
-        if(localStorage.name){
-            this.isLogin=true;
+        if (this.$store.getters.isLogged) {
+            this.isLogged = true
         }
     },
+    computed:{
+        getLogged() {
+            console.log("Loggggggged ?????????????? : ",this.$store.getters.isLogged,this.$store.getters.isLogged2);
+            return this.$store.getters.isLogged || this.$store.getters.isLogged2;
+        }
+    },
+    // beforeUpdate(){
+    //     getLogged: {
+    //         this.$store.getters.isLogged = true;
+    //     }
+    // },
+    // watch: {
+    //     getLogged: {
+    //         deep: true,
+    //         handler: function (newVal) {
+    //             this.isLogged = newVal;
+    //         }
+    //     }
+    // },
     methods:{
         logout(){
-            localStorage.removeItem('name');
-            this.$router.push('/');
-            this.$router.go();
+            console.log(this.$store.getters.getUser)
+            this.isLogged = false
+            this.$store.dispatch('disconnect')
+            this.$router.push({name:"Login"});
+            this.$forceUpdate()
+        },
+        setAuth(){
+            console.log('coucouc');
+            this.isLogged = true
+            // this.$forceUpdate()
+        },
+        forceRerender() {
+            this.componentKey += 1;
         }
+        // logged(){
+        //     return this.$store.getters.isLogged;
+        // }
     }
 }
 </script>
@@ -92,10 +125,9 @@ export default {
         .connexion-link{
             margin-right:20px;
         }
-        .genre-link{
+        // .genre-link{
             
-        }
-        
+        // }
         
   }
 </style>
