@@ -1,12 +1,13 @@
 # from functions import *
 from tokenize import String
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request, Body
 import sys
 from pydantic import BaseModel
 from pymongo import MongoClient
 import os
 from passlib.hash import sha256_crypt
 import jwt
+import itertools
 
 from tools import jwt_auth
 
@@ -53,6 +54,7 @@ db = client.wtwt
 movies = db.movies
 people = db.people
 users = db.users
+groups = db.groups
 
 
 
@@ -76,15 +78,23 @@ async def root():
 
 
 @app.get('/movie/genre', tags=['imdb'])
-async def movie_by_genre(genre):
+async def movie_by_genre(genre, request: Request):
     res = get_movie_by_genre(genre=genre)
-    # print(res.json())
-    return res.json()
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        # print(res.json())
+        return res.json()
 
 @app.get('/movie/popular', tags=['imdb'])
-async def get_popular_movie():
-    res = get_popular_movies_imdb()
-    return res.json()
+async def get_popular_movie(request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        res = get_popular_movies_imdb()
+        return res.json()
 
 # @jwt_auth
 @app.get("/movies/{genre}/{page}", tags=['mongo'])
@@ -100,14 +110,22 @@ async def get_movie_by_genre_and_page_number(genre, page:int, request: Request):
         return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
 @app.get("/oneMovie/{movie_id}", tags=['mongo'])
-async def get_one_by_id(movie_id: str):
-    return [ a for a in movies.find({"_id" : movie_id})]
+async def get_one_by_id(movie_id: str, request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        return [ a for a in movies.find({"_id" : movie_id})]
 
 @app.get('/movie/detail/{id}', tags=['imdb'])
-async def movie_by_id(id):
-    res = get_movie_by_id(id=id)
-    # print(res.json())
-    return res.json()
+async def movie_by_id(id, request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        res = get_movie_by_id(id=id)
+        # print(res.json())
+        return res.json()
 
 @app.post('/movie/insert', tags=['mongo-test'])
 async def insert_movie(data : Request):
@@ -124,54 +142,88 @@ async def get_movies():
 
 
 @app.get("/genres/", tags=['mongo'])
-async def genres():
-    import itertools
-    return len(set(list(itertools.chain(*[ m['genres'].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(100000)]))))
-    # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
+async def genres(request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        return len(set(list(itertools.chain(*[ m['genres'].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(100000)]))))
+        # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
 @app.get("/borne_note/", tags=['mongo'])
-async def borne_note(req : Request):
-    is_autorized = verify_token(req)
-    if is_autorized:
-        import itertools
+async def borne_note(request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
         vote = set([int(m.get('numVotes', 0)) for m in movies.find({},{ "numVotes": 1 , "_id" : 0}).limit(100000)])
         return [min(vote), max(vote)]
     
 
 @app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}", tags=['mongo'])
-async def get_movie_by_genre_and_page_number(genre, page:int):
-    # limite = page * 10
-    skip = page - 1
-    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+async def get_movie_by_genre_and_page_number(genre, page:int, request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        # limite = page * 10
+        skip = page - 1
+        return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
 @app.get("/movies/{mot_clef}", tags=['mongo'])
-async def get_movie_by_genre_and_page_number(genre, page:int):
-    # limite = page * 10
-    skip = page - 1
-    return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
+async def get_movie_by_genre_and_page_number(genre, page:int, request: Request):
+    error = jwt_auth(request)
+    if error:
+        return error
+    else:
+        # limite = page * 10
+        skip = page - 1
+        return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
 class User(BaseModel):
     username : str
     password : str
+    group: str = None
 
 @app.post("/user/register/", tags=['user'])
-async def create_user(body: User):
+async def create_user(body : User):
     hash_password = generate_hash(body.password)
-    res = users.insert_one({
-        "username" : body.username,
-        "password" : hash_password,
-    })
+    check_exist_group = groups.find_one({"name" : body.group})
+    check_exist_user = users.find_one({"username" : body.username})
+    if check_exist_user is None or len(list(check_exist_user)) < 1:
 
-    user_id = str(res.inserted_id) 
+        if check_exist_group is None or len(list(check_exist_group)) < 1:
+            print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+            groups.insert_one({"name" : body.group, "members":[body.username]})
+        else:
+            myquery = { "_id": check_exist_group["_id"] }
+            new_data = {"$push" : { "members" : body.username}}
+            groups.update_one(myquery, new_data)
+
+        res = users.insert_one({
+            "username" : body.username,
+            "password" : hash_password,
+            "group" : body.group
+        })
+
+        user_id = str(res.inserted_id) 
 
 
-    token = encode_auth_token({
-        "username": body.username,
-        "password": body.password,
-        "user_id": user_id
-    })
+        token = encode_auth_token({
+            "username": body.username,
+            "password": body.password,
+            "user_id": user_id,
+            "exp" : 13717209,
+        })
 
-    return {"token" : token}
+        return {"token" : token}
+    else:
+        return {
+            "error" : {
+                    "code" : 403,
+                    "message" : "Ce nom d'utilisateur existe déjà"
+                }
+        }
 
 @app.post("/user/login/", tags=['user'])
 async def login(body: User):
@@ -183,7 +235,8 @@ async def login(body: User):
             token = encode_auth_token({
                 "username": body.username,
                 "password": body.password,
-                "user_id": str(user["_id"])
+                "user_id": str(user["_id"]),
+                "exp" : 13717209,
             })
 
             return {
@@ -207,10 +260,15 @@ async def login(body: User):
                 }
             }
 
+@app.get("/test")
+async def callPython(username):
+    like_movie("tt0000005",username)
+    return {"test": "test"}
+
 
 
 def get_movie_by_id(id: str):
-        return requests.get(f'https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
+    return requests.get(f'https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
 
 def get_movie_by_genre(genre: list):
     req = "https://imdb-api.com/API/AdvancedSearch/k_xgqcmk1o/?genres=" + genre
@@ -251,6 +309,49 @@ def generate_hash(password):
 def verify_hash(password, hash):
     return sha256_crypt.verify(password, hash)
 
+
+# def proposition_perso(username):
+#     user = users.find_one({'username': username})
+#     if user:
+#         genres = user["genres"]
+
+
+def like_movie(movieId, username):
+    # movie_already_liked = users.find_one({"username" : username},)
+    users.update_one({"username" : username},{"$push" : { "films" : movieId }})
+    genre = users.find_one({"username" : username},{"genres": 1, "_id" : 0})
+    genreAdd = movies.find_one({"_id" : movieId})["genres"]
+    # print(genreAdd.split(','))
+    if len(list(genre)) == 0:
+        res = {}
+        for x in genreAdd.split(','):
+             res[x] = 1
+    # print(res)
+    else :
+        res = genre["genres"]
+        # taille = len(list(genre))
+        for x in genreAdd.split(','):
+            if x in res:
+                for i in res.keys():
+                    if x == i:
+                        res[i] += 1
+            else:
+                res[x] = 1
+    # print(res)
+    # calculate_genre(username)
+    users.update_one({"username" : username},{"$set" : { "genres" : res }})
+
+# def updat_genres(genres):
+
+
+
+
+def calculate_genre(username):
+    user = users.find_one({"username" : username})
+    movie_list = list(user["films"])
+    movies.find().limit(10)
+
+
 # def getMoviesListID(idList : list):
 #     res = []
 #     for id in idList:
@@ -261,7 +362,7 @@ def verify_hash(password, hash):
 
 # @app.get("/genres/")
 # async def genres():
-#     import itertools
+#  
 #     print(set(list(itertools.chain([m["genres"] for m in movies.find({},{ "genres": 1 , "_id" : 0}).limit(10)]))))
 #     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 

@@ -50,6 +50,7 @@ import FilmGrid from '../components/FilmGrid.vue';
 import movies from '../assets/data/movies'
 import VerticalMenu from '../components/VerticalMenu.vue';
 import Enum from "../utils/enum"
+import MenuVue from '@/components/Menu.vue';
 export default{
   name:'Home',
   components : {
@@ -74,6 +75,7 @@ export default{
     }
   },
   mounted(){
+    MenuVue.methods.setAuth()
   },
   methods: {
     clickOnGenre(genreId) {

@@ -1,9 +1,10 @@
 {
     "_id" : "084FEZj",
-    "name" : "Alex",
+    "username" : "Alex",
+    "password" : "zejzhzfohzfhzf",
     "group" : {
         "name" : "GroupName",
-        "_idGroup" : 12 
+        "_idGroup" : 12
     },
     "films" : [
         "tt0000011",
