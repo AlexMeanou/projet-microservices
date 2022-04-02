@@ -376,7 +376,7 @@ def verify_hash(password, hash):
 
 
 def like_movie(movieId, username):
-    # movie_already_liked = users.find_one({"username" : username},)
+    movie_already_liked = users.find_one({"username" : username},)
     users.update_one({"username": username}, {"$push": {"films": movieId}})
     genre = users.find_one({"username": username}, {"genres": 1, "_id": 0})
     genreAdd = movies.find_one({"_id": movieId})["genres"]
