@@ -50,7 +50,7 @@ except KeyError as e:
 
 db = client.wtwt
 movies = db.movies
-people = db.people
+people = db.pepole # en local mettre pepole de mon coté car faute dans le script d'init au départ, mais ca a déjà ete corrigé
 users = db.users
 groups = db.groups
 
@@ -110,6 +110,37 @@ async def get_popular_movie(request: Request):
 
 # genres(listgenre??) - page - isadulte(bool) - acteur(liste)?? - langue(listelangue) - notes(list[1,6])
 
+@app.get("/movies/notes/{notes}/{page}")
+async def get_movies_by_notes(notes,page:int):
+    # print(notes[1])
+    # print(notes[3])
+    return [m for m in movies.find({'averageRating' : {'$gte': notes[1], '$lte' : notes[3]}}).skip(page * 10).limit(10)]
+    # return [m for m in movies.find({ '$expr': { '$gt': [{ '$toDouble': "$averageRating" }, notes[1]] } }).limit(5)]
+
+@app.get("/movies/adult/{page}")
+async def get_movies_for_adult_audience(page:int):
+    return [m for m in movies.find({'isAdult': {'$eq' : 1}}).skip(page * 10).limit(10)]
+    
+@app.get("/movies/acteurs/{acteur}")  # Route qui renvoie les films ayant dans leur actorList l'acteur recherché
+async def get_movies_by_actors(acteur):
+    return [m for m in movies.find({'actorList.name' : {'$regex': acteur}}).limit(10)]
+
+@app.get("/movies/people/{acteur}") # Route qui renvoie une liste de films dans laquelle l'acteur joue (on peut les récup sur le front et ensuite appeler le get_movie_by_id pour les id recup)
+async def get_movies_from_actors(acteur):
+    return people.find_one({'primaryName' : acteur})["knownForTitles"]
+
+@app.get("/movies/group/{name}") # J'ai pas eu le temps de vraiment la tester comme il faudrait, ma bdd est pas comme il faut la avec tout les tests que je fais, ça marche pour un user et surement pour les groups de base mais seulement si tout le monde a au moins like un films en fait, si jamais ca retourne vide je sais pas si ca va marcher
+async def get_movies_liked_by_group(name):
+    users_group = list(groups.find_one({'name' : name})["members"])
+    movies_liked = []
+    for x in range(len(users_group)):
+        # print(users_group[x])
+        data = users.find_one({"username" : users_group[x]})
+        if data["liked_movies"] is not None:
+            for x in data["liked_movies"]:
+                movies_liked.append(x)
+    print(movies_liked)
+    
 
 @app.get("/movies/{genre}/{page}", tags=['mongo'])
 async def get_all_movies_by_page(genre: str, page: int):
@@ -316,8 +347,9 @@ async def login(body: User):
 
 @app.get("/test")
 async def callPython(username):
-    like_movie("tt0000005", username)
-    return {"test": "test"}
+    # return like_movie("tt0000014", username)
+    return calculate_genre(username)
+    
 
 
 def get_movie_by_id(id: str):
@@ -376,37 +408,58 @@ def verify_hash(password, hash):
 
 
 def like_movie(movieId, username):
-    movie_already_liked = users.find_one({"username" : username},)
-    users.update_one({"username": username}, {"$push": {"films": movieId}})
-    genre = users.find_one({"username": username}, {"genres": 1, "_id": 0})
-    genreAdd = movies.find_one({"_id": movieId})["genres"]
-    # print(genreAdd.split(','))
-    if len(list(genre)) == 0:
-        res = {}
-        for x in genreAdd.split(','):
-            res[x] = 1
-    # print(res)
+    check = True 
+    movie_already_liked = users.find_one({"username" : username},{"liked_movies": 1, "_id": 0})
+    if len(list(movie_already_liked)) == 0:
+        users.update_one({"username": username}, {"$push": {"liked_movies": movieId}})
     else:
-        res = genre["genres"]
-        # taille = len(list(genre))
-        for x in genreAdd.split(','):
-            if x in res:
-                for i in res.keys():
-                    if x == i:
-                        res[i] += 1
-            else:
+        test = movie_already_liked["liked_movies"]
+        for x in test:
+            if x == movieId:
+                check = False
+    
+    if check:
+        users.update_one({"username": username}, {"$push": {"liked_movies": movieId}})
+
+        genre = users.find_one({"username": username}, {"genres": 1, "_id": 0})
+        genreAdd = movies.find_one({"_id": movieId})["genres"]
+        # print(genreAdd.split(','))
+        if len(list(genre)) == 0:
+            res = {}
+            for x in genreAdd.split(','):
                 res[x] = 1
-    # print(res)
-    # calculate_genre(username)
-    users.update_one({"username": username}, {"$set": {"genres": res}})
+        # print(res)
+        else:
+            res = genre["genres"]
+            # taille = len(list(genre))
+            for x in genreAdd.split(','):
+                if x in res:
+                    for i in res.keys():
+                        if x == i:
+                            res[i] += 1
+                else:
+                    res[x] = 1
+        # print(res)
+        # calculate_genre(username)
+        users.update_one({"username": username}, {"$set": {"genres": res}})
+        return res
+    else:
+        return {"error" : "Vous avez déjà aimé ce film"}
 
 # def updat_genres(genres):
 
 
 def calculate_genre(username):
-    user = users.find_one({"username": username})
-    movie_list = list(user["films"])
-    movies.find().limit(10)
+    user = users.find_one({"username": username})["genres"]
+    # list_genre = user.split(',')
+    # movies.find().limit(10)
+    most_viewed_genre = sorted(user, key=user.get, reverse=True)
+    return most_viewed_genre[:3]
+    # print(most_viewed_genre)
+        # print(x)
+        # print(user[x])
+        # tt.append(user[x])
+    
 
 
 # def getMoviesListID(idList : list):
