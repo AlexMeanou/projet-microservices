@@ -1,8 +1,9 @@
 .venv/
+
 __pycache__/
 mongodb/__pycache__/
 mongodb/data/
-mongodb/BDD/
+fast_api/BDD/
 
 fast_api/__pycache__
 fast_api/bdd/__pycache__

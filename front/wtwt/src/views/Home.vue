@@ -4,44 +4,47 @@
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
           <ul class="navbar-nav">
-            <li class="nav-item"> <a class="nav-link" @click="clickOnGenre(Enum.genre.ACTION)">Action</a> </li>
-            <li class="item"><a class="nav-link" @click="clickOnGenre(Enum.genre.COMEDIE)">Commédie</a></li>
-            <li class="nav-item"><a class="nav-link" @click="clickOnGenre(Enum.genre.ANIME)">Anime</a></li>
-            <li class="nav-item"> <a class="nav-link"  @click="clickOnGenre(Enum.genre.ROMANTIQUE)">Romantique</a> </li>
-            <li class="nav-item"><a class="nav-link" @click="clickOnGenre(Enum.genre.SCIENCEFICTION)">Science Fiction</a> </li>
-            <li class="nav-item">
-              <select class="nav-link selected-genre" aria-label="genre" v-model="selectedGenre" @change="selectGenre()">
-                <option v-bind:value="Enum.genre.TOUS" selected>Tous les genres</option>
-                <option v-bind:value="Enum.genre.ACTION">Action</option>
-                <option v-bind:value="Enum.genre.COMEDIE">Comedie</option>
-                <option v-bind:value="Enum.genre.ANIME">Anime</option>
-                <option v-bind:value="Enum.genre.ROMANTIQUE">Romantique</option>
-                <option v-bind:value="Enum.genre.SCIENCEFICTION">Science Fiction</option>
-              </select>
-            </li>
-            <li>
-              <form style="margin-left:10px" class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn" type="submit">Search</button>
-              </form>
-            </li>
+              <div v-for="genre in this.$store.getters.getGenres" :key="genre" >
+                <li class="nav-item"> <a class="nav-link" @click="clickOnGenre(genre)">{{genre}}</a> </li>
+            </div>
           </ul>
       </div>
     </nav>
-
-    <div class="container">
-      <vertical-menu class="col" 
-        @langues="selectLangues($event)"
-        @acteurs="selectActeurs($event)"
-        @isAdult="selectAdult($event)"
-        @notes="selectNotes($event)"
-        @nbVotes="selectVotes($event)"/>
-
+    <div class="row">
+      <div class="col">
+        <vertical-menu class="col" 
+          @langues="selectLangues($event)"
+          @acteurs="selectActeurs($event)"
+          @isAdult="selectAdult($event)"
+          @notes="selectNotes($event)"
+          @nbVotes="selectVotes($event)"/>
+      </div>
       <div class="grid-container col">
-        {{movies}}
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+      dd<br>
+        {{ this.$store.getters.getMovies}}
         <film-grid :movies="movies" :filterMovies="filterMovies"/>
         <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="changePage()"></v-pagination>
       </div>
+
+    </div>
+    <div class="container">
+
     </div>
   </div>
 </template>
@@ -77,12 +80,34 @@ export default{
   },
   mounted(){
     MenuVue.methods.setAuth()
+    this.$store.dispatch('getGenres')
+    console.log(this.$store.getters.getGenres)
   },
   methods: {
-    clickOnGenre(genreId) {
-      this.filterList.genre=genreId;
+    changePage() {
+      this.$store.dispatch('getMoviesByGenre', {
+        page : this.page,
+        genre : this.genre,
+      }).then(() => {
+        console.log("j'en ai marre", this.$store.getters.getMovies)
+        // AppVue.computed.key.set()
+        // console.log("=================", page, genre)
+        this.$router.push({name:"Home"})
+      }).catch(
+        (err) => {
+          this.errorAtLogin = {
+            code : err.code,
+            message : err.message
+          }
+        }
+      )
+    },
+    clickOnGenre(genre) {
+      console.log(genre)
+      this.genre = genre
+      // this.filterList.genre=genreId;
     
-       this.filter();
+      //  this.filter(); 
     },
     selectGenre(){
       this.filterList.genre=this.selectedGenre;
@@ -129,24 +154,29 @@ export default{
       
     },
     filterGenre(){
-
+      return 0
     },
-    changePage(){
-      console.log("filerList",this.filterList);
-      this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-      console.log("page numero",this.page);
-       this.axios.get('http://localhost:8585/movies/Short/' + this.page)
-      .then(response =>{
-        this.movies = response.data
-        console.log(this.movies)
-      } );
-    }
+    // changePage(){
+    //   this.movies = 
+    //   // console.log("filerList",this.filterList);
+    //   // this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+    //   // console.log("page numero",this.page);
+    //   //  this.axios.get('http://localhost:8585/movies/Short/' + this.page)
+    //   // .then(response =>{
+    //   //   this.movies = response.data
+    //   //   console.log(this.movies)
+    //   // } );
+    // }
   }
 }
 
 </script>
 
 <style scoped lang="scss">
+  // .nav-genre{
+  //   // height : 100%;
+  //   // overflow-x : scroll ;
+  // }
   .navbar{
     position:fixed !important;
     padding-top:70px;
