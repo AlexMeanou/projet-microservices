@@ -185,7 +185,11 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
     # print(f"/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}")
     # print({'$and': find_list})
     # print("================================================")
-    for movie in movies.find({'$and': find_list}).skip(page * 10).limit(10):
+    if len(find_list) > 0:
+        res = {'$and': [find_list]}
+    else:
+        res = None
+    for movie in movies.find(res).skip(page * 10).limit(10):
         if not is_enough_for_home_page(movie):
             refersh_movie_data(movie['_id'])
             new_data_movie = movies.find({"_id": movie['_id']})

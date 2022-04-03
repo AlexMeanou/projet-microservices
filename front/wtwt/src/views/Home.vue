@@ -24,6 +24,9 @@
                 <label for="exampleFormControlInput1">Acteur Name</label>
                 <input v-model='actor' type="text" class="form-control" id="exampleFormControlInput1" placeholder="acteur name">
             </div>
+            <label class="form-label" for="form-group">Nombre de votes</label>
+            <v-slider v-model="nbVotes" thumb-color="white" thumb-label="always" :max="255" class="align-center" style="margin-top:1.8rem" @click="$emit('nbVotes',nbVotes)"> </v-slider>
+          
 
             <div>
                 <button type="submit">save</button>
