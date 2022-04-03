@@ -44,12 +44,13 @@ def download_files(path = "tmp"):
 
 def import_rating(ratings_file): 
     client = MongoClient()
-    # try:
-    #     MONGO_URL = 'localhost:27017'
-    #     print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz   Bien connecte a la BDD')
-    #     client = MongoClient(MONGO_URL)
-    # except KeyError:
-    #     pass
+    try:
+        MONGO_URL = 'mongodb://root:tata@localhost:27017'
+        # MONGO_URL = os.environ['MONGODB_CONNSTRING']
+        client = MongoClient(MONGO_URL)
+        print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz   Bien connecte a la BDD')
+    except KeyError:
+        pass
     db = client.wtwt
     movies = db.movies
 
@@ -67,7 +68,7 @@ def import_files_in_mongodb(path = "tmp", database = 'wtwt'):
         if remplace : 
             com = f"sed -i 's/{el[0]}/{el[1]}/g' {name_file}"
             os.system(com)
-        com = f"mongoimport --db wtwt --collection {collection_name} --type tsv --file {name_file} --headerline --verbose "
+        com = f"mongoimport --uri mongodb://root:tata@localhost:27017/{database} --collection {collection_name} --type tsv --file {name_file} --headerline --stopOnError --verbose --authenticationDatabase admin"
         os.system(com)
     # --host localhost --port 27017 --username toto --password 'tata' --db {database} 
     import_tsv_mongodb(os.path.join(path, "dataNameSample.tsv"), "people", remplace=True, el= ["nconst", "_id"])

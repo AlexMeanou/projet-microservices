@@ -1,10 +1,10 @@
 services:
-  # vue:
-  #   build:
-  #     context: ./front/wtwt
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8080:8080
+  vue:
+    build:
+      context: ./front/wtwt
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
 
   mongodb:
     image: mongo

@@ -133,10 +133,15 @@ async def get_movies_by_actors(acteur):
 
 
 # Route qui renvoie une liste de films dans laquelle l'acteur joue (on peut les récup sur le front et ensuite appeler le get_movie_by_id pour les id recup)
-# resor les films et pas leurment les id !!!!
+# resor les films et pas leurment les id !!!! GOOD
 @app.get("/movies/people/{acteur}")
 async def get_movies_from_actors(acteur):
-    return people.find_one({'primaryName': acteur})["knownForTitles"]
+    list_films = people.find_one({'primaryName': acteur})["knownForTitles"]
+    l_movies = []
+    for x in list_films.split(','):
+        l_movies.append(movies.find_one({'_id' : x}))
+    return l_movies
+
 
 
 @app.get("/movies/group/{name}")  # J'ai pas eu le temps de vraiment la tester comme il faudrait, ma bdd est pas comme il faut la avec tout les tests que je fais, ça marche pour un user et surement pour les groups de base mais seulement si tout le monde a au moins like un films en fait, si jamais ca retourne vide je sais pas si ca va marcher
@@ -146,11 +151,18 @@ async def get_movies_liked_by_group(name):
     for x in range(len(users_group)):
         # print(users_group[x])
         data = users.find_one({"username": users_group[x]})
-        if data["liked_movies"] is not None:
+        if data.get("liked_movies", None) != None:
             for x in data["liked_movies"]:
                 movies_liked.append(x)
-    print(movies_liked)
+            l_movies = []
+            for x in set(movies_liked):
+                l_movies.append(movies.find_one({'_id' : x}))
+    return l_movies
+    # print(movies_liked)
 
+@app.post("/movies/liked/{username}/{movie_id}")
+async def like_a_movie(username, movie_id):
+    return like_movie(movie_id, username)
 
 @app.get("/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}", tags=['mongo'])
 async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,  actor: str, search: str, page: int):
@@ -183,6 +195,13 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
 # une route qui donne les films que le group a liké
 
 # une route qui se base sur les preferense des utilisateur et resort une liste de film qui peuvent leurs plaire
+
+@app.get("/movies/personnalized/{username}")
+async def get_movies_based_on_preference(username):
+    data = calculate_genre(username)
+    print(data[0])
+    test = movies.find({"$and": [ { "genres" : {"$regex": data[0]}},{"genres" : {"$regex": data[1]} }]}).limit(10)
+    return [x for x in test]
 
 
 @ app.get("/oneMovie/{movie_id}", tags=['mongo'])
@@ -481,11 +500,15 @@ def like_movie(movieId, username):
 
 
 def calculate_genre(username):
-    user = users.find_one({"username": username})["genres"]
+    user = users.find_one({"username": username})
+    if user.get("genres", None) != None:
+        userRes = user["genres"]
+        most_viewed_genre = sorted(userRes, key=userRes.get, reverse=True)
+        return most_viewed_genre[:2]
+    else:
+        return {"Error" : "L'user n'a pas encore like de films"}
     # list_genre = user.split(',')
     # movies.find().limit(10)
-    most_viewed_genre = sorted(user, key=user.get, reverse=True)
-    return most_viewed_genre[:3]
     # print(most_viewed_genre)
     # print(x)
     # print(user[x])
