@@ -97,13 +97,13 @@ export default {
             this.barMaxValue = e.maxValue;
         },
         reloadMovies() {
+            // const test = this.is_adult ? "1" : "0"
             this.$store.dispatch('getMoviesByGenre', {
                 page: this.page,
                 genre: this.genre,
                 note_inf: this.note_inf,
                 note_sup: this.note_sup,
                 search_input: this.search_input,
-                // is_adult: this.is_adult ? "1" : "0",
                 actor: this.actor,
             }).then(() => {
 
