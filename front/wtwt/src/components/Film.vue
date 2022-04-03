@@ -1,4 +1,5 @@
 <template>
+{{id}}
 <div class="product-grid2">
     <div class="product-image2">
         <a href="#">
@@ -9,7 +10,11 @@
             <li><a href="#" data-tip="like"><i class="fa fa-eye"></i></a></li>
             <li><a href="#" data-tip="Add to Wishlist"><i class="fa fa-shopping-bag"></i></a></li>
         </ul>
-        <a class="add-to-cart" href="">quick view</a>
+        <a class="add-to-cart" href="">
+            <router-link  :to="{ name: 'Film', params: { id: movie._id}}">
+                quick view
+            </router-link>
+        </a>
     </div>
     <div class="product-content">
         <h3 class="title"><a href="#">{{movie.title}}</a></h3>
@@ -29,7 +34,6 @@ export default {
         }
     },
     mounted() {
-        console.log("coucou", this.movies)
     },
     methods: {
         goToFilm() {
@@ -66,7 +70,9 @@ export default {
 
 .product-image2 .pic-1 {
     opacity: 1;
-    transition: all .5s
+    transition: all .5s;
+    max-width: 100%;
+    height: auto;
 }
 
 .product-grid2:hover .product-image2 .pic-1 {
@@ -76,10 +82,12 @@ export default {
 .product-image2 .pic-2 {
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    height: auto;
     opacity: 0;
     top: 0;
     left: 0;
-    position:absolute;
+    position: absolute;
     transition: all .5s
 }
 

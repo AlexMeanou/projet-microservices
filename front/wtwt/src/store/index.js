@@ -33,12 +33,14 @@ export default new Vuex.Store({
     setMovies(state, movies) {
       state.movies = movies;
     },
+    setMovie(state, movie) {
+      state.movie = movie;
+    },
     setMoviesUser(state, movies) {
       state.moviesUser = movies;
     },
     setGenres(state, genres) {
       state.genres = genres;
-      console.log("mabite", state.genres)
     }
   },
   actions: {
@@ -48,10 +50,17 @@ export default new Vuex.Store({
       const res = await axios.get(url, { headers })
       res.data.splice(res.data.indexOf("/N"), 1)
       state.commit('setGenres', res.data)
-      console.log("on get les genres une fois pour afficher la barre de navigation", state.genres)
+    },
+    async getMovie(state, payload) {
+      const headers = { "Authorization": state.getters.getToken }
+      const url = 'http://localhost:8585/oneMovie/'
+      const res = await axios.get(
+        url 
+        + payload.id,
+        { headers })
+      state.commit('setMovie', res.data)
     },
     async getMoviesByGenre(state, payload) {
-      console.log(payload)
       const headers = { "Authorization": state.getters.getToken }
       const url = 'http://localhost:8585/movies/'
       const res = await axios.get(
@@ -115,8 +124,8 @@ export default new Vuex.Store({
     getToken: () => JSON.parse(localStorage.getItem('user'))?.token,
     getGenres: state => state.genres,
     getMovies: state => state.movies,
+    getMovie: state => state.movie,
     isLogged: () => {
-      console.log('isLogged', localStorage)
       const user = JSON.parse(localStorage.getItem('user'))
       return user && user.token !== ('' && null)
     },

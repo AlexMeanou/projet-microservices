@@ -83,7 +83,6 @@ export default {
             return true;
         },
         subscribe(){
-            console.log("on inscrit l'utilisteur avec le nom et son password")
         }
     }
 }

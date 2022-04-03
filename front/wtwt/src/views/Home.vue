@@ -5,60 +5,74 @@
         <a v-for="genre in this.$store.getters.getGenres" :key="genre" @click="clickOnGenre(genre)">{{genre}}</a>
     </div>
     <div class="container">
-        <div class="d-flex justify-content-center">
-            <div class="search">
-                <input v-model="search_input" class="search_input" type="text" name="" placeholder="Search here...">
-                <a @click="search(search_input)" class="search_icon"><i class="fa fa-search"></i></a>
+        <div class="pad">
 
+            <div class="d-flex justify-content-center">
+                <div class="search">
+                    <input v-model="search_input" class="search_input" type="text" name="" placeholder="Search here...">
+                    <a @click="search(search_input)" class="search_icon"><i class="fa fa-search"></i></a>
+
+                </div>
+                <div class="search">
+                    <a @click="showFilter()" class="search_icon"><i class="fa fa-search">more</i></a>
+                </div>
             </div>
-            <div class="search">
-                <a @click="showFilter()" class="search_icon"><i class="fa fa-search">more</i></a>
+            <br/>
+
+            <form v-if="show_filter" @submit.prevent="saveFilter">
+                <div class="advensed-search">
+                    <input v-model="is_adult" class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                    <label class="form-check-label" for="defaultCheck1">
+                        Adult Movie
+                    </label>
+                    <br/>
+                    <br/>
+
+                    <div>
+                        <label for="exampleFormControlInput1">Acteur Name : (cette fonctionnalité comporte un probleme pour son bon fonctionnememnt il faut que le site soit rempli)</label>
+                        <input v-model='actor' type="text" class="form-control" id="exampleFormControlInput1" placeholder="acteur name">
+                    </div>
+                    <br />
+
+                    <label class="form-label" for="form-group">Nombre de votes</label>
+                    <MultiRangeSlider :min="0" :max="10" :step="1" :ruler="true" :label="false" :minValue="note_inf" :maxValue="note_sup" @input="UpdateValues" />
+
+                    <div>
+                        <button class="save_button" type="submit">save</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 col-sm-6" v-for="movie in this.$store.getters.getMovies" :key="movie._id">
+                <film :movie="movie" />
             </div>
         </div>
-        <form v-if="show_filter" @submit.prevent="saveFilter">
-            <input v-model="is_adult" class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-            <label class="form-check-label" for="defaultCheck1">
-                Adult Movie
-            </label>
-            <div class="form-group">
-                <label for="exampleFormControlInput1">Acteur Name</label>
-                <input v-model='actor' type="text" class="form-control" id="exampleFormControlInput1" placeholder="acteur name">
-            </div>
-            <label class="form-label" for="form-group">Nombre de votes</label>
-            <v-slider v-model="nbVotes" thumb-color="white" thumb-label="always" :max="255" class="align-center" style="margin-top:1.8rem" @click="$emit('nbVotes',nbVotes)"> </v-slider>
-          
 
-            <div>
-                <button type="submit">save</button>
-            </div>
-        </form>
+        <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="reloadMovies()"></v-pagination>
+
     </div>
-
-    <div class="row">
-        <div class="col-md-3 col-sm-6" v-for="movie in this.$store.getters.getMovies" :key="movie._id">
-            <film :movie="movie" />
-        </div>
-    </div>
-
-    <v-pagination color="#e4872c" v-model="page" :length="20" :value="page" @click="reloadMovies()"></v-pagination>
-
 </div>
 </template>
 
 <script>
 import Film from '../components/Film.vue';
-
-import Enum from "../utils/enum"
+import MultiRangeSlider from "multi-range-slider-vue";
 import MenuVue from '@/components/Menu.vue';
 export default {
     name: 'Home',
     components: {
+        MultiRangeSlider,
         // FilmGrid,
         Film,
         // VerticalMenu,
     },
     data: function () {
         return {
+            barMinValue: 0,
+            barMaxValue: 10,
             show_filter: false,
             is_adult: false,
             genre: "all",
@@ -78,6 +92,10 @@ export default {
         this.reloadMovies()
     },
     methods: {
+        UpdateValues(e) {
+            this.barMinValue = e.minValue;
+            this.barMaxValue = e.maxValue;
+        },
         reloadMovies() {
             this.$store.dispatch('getMoviesByGenre', {
                 page: this.page,
@@ -89,9 +107,7 @@ export default {
                 actor: this.actor,
             }).then(() => {
 
-                console.log("ggg")
                 this.movies = this.$store.getters.getMovies
-                console.log("les films ont etet reload", this.movies)
                 this.$router.push({
                     name: "Home"
                 })
@@ -105,79 +121,19 @@ export default {
             )
         },
         saveFilter() {
-            console.log("je save", this.is_adult)
             this.reloadMovies()
         },
         showFilter() {
             this.show_filter = !this.show_filter;
-            console.log("on montre les filtres")
         },
         clickOnGenre(genre) {
-            console.log(genre)
             this.genre = genre
             this.reloadMovies()
-            // this.filterList.genre=genreId;
-
-            //  this.filter(); 
-        },
-        selectGenre() {
-            this.filterList.genre = this.selectedGenre;
-            this.filter();
+            
         },
         search(search_input) {
             this.search_input = search_input
-            console.log(search_input)
-        },
-        selectLangues(langues) {
-            this.filterList.langues = langues;
-            this.filter();
-        },
-        selectActeurs(acteurs) {
-            this.filterList.acteurs = acteurs;
-            this.filter();
-        },
-        selectNotes(notes) {
-            this.filterList.notes = notes;
-            this.filter();
-        },
-        selectVotes(nbVotes) {
-            this.filterList.nbVotes = nbVotes;
-            this.filter();
-        },
-        selectAdult(isAdult) {
-            this.filterList.isAdult = isAdult;
-            this.filter();
-        },
-        filter() {
-            console.log("filter", this.filterList);
-            this.filterMovies = this.movies.filter(x => {
-                if (this.filterList.genre !== Enum.genre.TOUS) {
-                    return x.genres == this.filterList.genre
-                } else {
-                    return true;
-                }
-            });
-
-            this.filterMovies = this.filterMovies.filter(x =>
-                this.filterList.langues.every(l => {
-                    return x.languages.includes(l);
-                }));
-
-        },
-        filterGenre() {
-            return 0
-        },
-        // changePage(){
-        //   this.movies = 
-        //   // console.log("filerList",this.filterList);
-        //   // this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-        //   // console.log("page numero",this.page);
-        //   //  this.axios.get('http://localhost:8585/movies/Short/' + this.page)
-        //   // .then(response =>{
-        //   //   this.movies = response.data
-        //   //   console.log(this.movies)
-        //   // } );
-        // }
+        }
     }
 }
 </script>
@@ -188,6 +144,18 @@ export default {
     background-color: black;
     border-radius: 40px;
     padding: 10px
+}
+
+.pad{
+  padding : 10px;
+}
+.advensed-search {
+    text-align: center;
+
+    background-color: black;
+    border-radius: 40px;
+    padding: 20px;
+    color: white;
 }
 
 .search_input {
@@ -201,6 +169,8 @@ export default {
     line-height: 40px;
     transition: width 0.4s linear
 }
+
+.save_button {}
 
 .search .search_input {
     width: 550px;

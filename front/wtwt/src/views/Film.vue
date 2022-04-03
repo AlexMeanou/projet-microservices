@@ -1,8 +1,7 @@
 <template style="color:white">
-<div class="film">
+<div class="film" v-if="is_load">
     <v-card  class="ma-3">
         <v-card-title>{{movie.title}}</v-card-title>
-        <div class="card-text"><b>genres : {{movie.genres}}</b></div>  
         <v-img :src="movie.image"></v-img>             
     </v-card>
     <div class="description">
@@ -28,7 +27,6 @@
 </template>
 
 <script>
-import movies from '../assets/data/movies'
 export default {
     components :{
     },
@@ -36,43 +34,38 @@ export default {
     data(){
         return {
             id:0,
+            is_load : false,
             movie : null,
-            actors :[
-                {text:"Leonardo Decaprio",value:1},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2},
-                {text:"Brad Pitt",value:2}, 
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-                {text:"Brad Pitt",value:2},  
-            ]
+            
         }
     },
-     created(){
+    computed() {
         this.id=this.$route.params.id;
-        this.movie= movies.find(x=>x._id==this.id);
+        this.movie = this.$store.getters.getMovie
+        this.reloadMovie()
+        this.is_load = true
     },
-    mounted(){
+    created(){
     }
+
     ,
     methods:{
+        reloadMovie() {
+        this.$store.dispatch('getMovie', {
+                id: this.id,
+                
+            }).then(() => {
+                this.movie = this.$store.getters.getMovie
+                
+            }).catch(
+                (err) => {
+                    this.errorAtLogin = {
+                        code: err.code,
+                        message: err.message
+                    }
+                }
+            )
+        }
     }
 
 }

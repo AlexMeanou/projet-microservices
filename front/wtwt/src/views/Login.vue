@@ -102,7 +102,6 @@ export default {
             group: this.userRegister.group
           }
         }).then((result) => {
-          console.log(result);
           if (result.error?.code) {
             this.errorAtRegister = {
               code : result.error.code,
@@ -114,7 +113,6 @@ export default {
           }
         });
       } else {
-        console.log("pas valide");
         this.errorAtRegister = {
           code : 400,
           message : "Le formulaire n'est pas valide"

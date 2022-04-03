@@ -24,11 +24,9 @@ export default {
         }
     },
     mounted() {
-        console.log("coucou", this.movies)
     },
     methods: {
         search(test) {
-            console.log(test)
         }
     }
 }
