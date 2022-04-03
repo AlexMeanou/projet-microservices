@@ -13,6 +13,7 @@
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
+    "vue-advanced-search": "^0.1.43",
     "vue-axios": "^3.4.1",
     "vue-router": "^4.0.13",
     "vuetify": "npm:@vuetify/nightly@next",

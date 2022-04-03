@@ -46,15 +46,22 @@ export default new Vuex.Store({
       const headers = { "Authorization": state.getters.getToken }
       const url = 'http://localhost:8585/genres/'
       const res = await axios.get(url, { headers })
-      console.log(res.data)
+      res.data.splice(res.data.indexOf("/N"), 1)
       state.commit('setGenres', res.data)
-      console.log("licorne", state.genres)
+      console.log("on get les genres une fois pour afficher la barre de navigation", state.genres)
     },
     async getMoviesByGenre(state, payload) {
       console.log(payload)
       const headers = { "Authorization": state.getters.getToken }
       const url = 'http://localhost:8585/movies/'
-      const res = await axios.get(url + payload.genre + "/" + payload.page, { headers })
+      const res = await axios.get(
+        url 
+        + payload.genre + "/" 
+        + payload.actor + "/" 
+        + payload.vote + "/" 
+        + payload.search + "/" 
+        + payload.page, 
+        { headers })
       console.log(url + payload.genre + "/" + payload.page, res.data)
       state.commit('setMovies', res.data)
     },
