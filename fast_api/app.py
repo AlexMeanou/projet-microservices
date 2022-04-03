@@ -166,27 +166,26 @@ async def like_a_movie(username, movie_id):
 
 
 @app.get("/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}", tags=['mongo'])
-async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,  actor: str, search: str, page: int):
+async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float, actor: str, search: str, page: int):
     page -= 1
     l_movies = []
     find_list = []
+    find_list.append(
+        {'averageRating': {'$gte': str(int(notes_inf)), '$lte': str(int(notes_sup))}})
     if genre != 'all':
         find_list.append({'genres': {'$regex': genre}})
     # if genre != ''
-    # if actor != 'nulle':
-    #     # find_list.append(f"{'genres': {'$regex': {genre}}}")
-    #     pass
-    # if search != 'nulle':
-    #     # todo
-    #     find_list.append(f"{{'genres': {{'$regex' : {genre}}}}}")
-    # find_list.append(
-    #     {'averageRating': {'$gte': str(int(notes_inf)), '$lte': str(int(notes_sup))}})
+    if actor != 'nulle':
+        find_list.append({'actorList': {'$regex': actor}})
+    if search != 'nulle':
+        find_list.append({'primaryTitle': {'$regex' : search}})
     # print("================================================")
     # print(f"/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}")
     # print({'$and': find_list})
     # print("================================================")
+    print(find_list)
     if len(find_list) > 0:
-        res = {'$and': [find_list]}
+        res = {'$and': find_list}
     else:
         res = None
     for movie in movies.find(res).skip(page * 10).limit(10):
@@ -412,17 +411,17 @@ async def callPython(username):
 
 
 def get_movie_by_id(id: str):
-    return requests.get(f'https://imdb-api.com/API/Title/k_4ja9gk6h/{id}/')
+    return requests.get(f'https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
 
 
 def get_movie_by_genre(genre: list):
-    req = "https://imdb-api.com/API/AdvancedSearch/k_4ja9gk6h/?genres=" + genre
+    req = "https://imdb-api.com/API/AdvancedSearch/k_xgqcmk1o/?genres=" + genre
     print(req)
     return requests.get(req)
 
 
 def get_popular_movies_imdb():
-    return requests.get('https://imdb-api.com/en/API/MostPopularMovies/k_4ja9gk6h')
+    return requests.get('https://imdb-api.com/en/API/MostPopularMovies/k_xgqcmk1o')
 
 
 def refersh_movie_data(id):
@@ -530,7 +529,7 @@ def calculate_genre(username):
 # def getMoviesListID(idList : list):
 #     res = []
 #     for id in idList:
-#         res.append(requests.get('https://imdb-api.com/API/Title/k_4ja9gk6h/{id}/'))
+#         res.append(requests.get('https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/'))
 #     return res
 
 
