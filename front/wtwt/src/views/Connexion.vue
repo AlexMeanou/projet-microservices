@@ -58,7 +58,6 @@ export default {
       if(this.isValid()){
         // traitement back
         if(this.isLoginCorrect()){
-          console.log("connexion reussie");
           localStorage.name=this.name;
           this.$router.push('/');
         }
