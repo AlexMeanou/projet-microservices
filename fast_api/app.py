@@ -40,15 +40,15 @@ tags_metadata = [
 
 client = MongoClient()
 
-try:
-    MONGO_URL = os.environ['MONGODB_CONNSTRING']
-    # MONGO_URL = "mongodb://toto:tata@localhost:27017/"
+# try:
+#     # MONGO_URL = os.environ['MONGODB_CONNSTRING']
+#     # MONGO_URL = "mongodb://toto:tata@localhost:27017/"
 
-    client = MongoClient(MONGO_URL)
-    print("BDD OK !", MONGO_URL)
-except KeyError as e:
-    print(e)
-    pass
+#     client = MongoClient()
+#     print("BDD OK !", )
+# except KeyError as e:
+#     print(e)
+#     pass
 
 db = client.wtwt
 movies = db.movies
@@ -139,9 +139,8 @@ async def get_movies_from_actors(acteur):
     list_films = people.find_one({'primaryName': acteur})["knownForTitles"]
     l_movies = []
     for x in list_films.split(','):
-        l_movies.append(movies.find_one({'_id' : x}))
+        l_movies.append(movies.find_one({'_id': x}))
     return l_movies
-
 
 
 @app.get("/movies/group/{name}")  # J'ai pas eu le temps de vraiment la tester comme il faudrait, ma bdd est pas comme il faut la avec tout les tests que je fais, ça marche pour un user et surement pour les groups de base mais seulement si tout le monde a au moins like un films en fait, si jamais ca retourne vide je sais pas si ca va marcher
@@ -156,21 +155,24 @@ async def get_movies_liked_by_group(name):
                 movies_liked.append(x)
             l_movies = []
             for x in set(movies_liked):
-                l_movies.append(movies.find_one({'_id' : x}))
+                l_movies.append(movies.find_one({'_id': x}))
     return l_movies
     # print(movies_liked)
+
 
 @app.post("/movies/liked/{username}/{movie_id}")
 async def like_a_movie(username, movie_id):
     return like_movie(movie_id, username)
+
 
 @app.get("/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}", tags=['mongo'])
 async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,  actor: str, search: str, page: int):
     page -= 1
     l_movies = []
     find_list = []
-    # if genre != 'all':
-    #     find_list.append({'genres': {'$regex': genre}})
+    if genre != 'all':
+        find_list.append({'genres': {'$regex': genre}})
+    # if genre != ''
     # if actor != 'nulle':
     #     # find_list.append(f"{'genres': {'$regex': {genre}}}")
     #     pass
@@ -183,7 +185,7 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
     # print(f"/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}")
     # print({'$and': find_list})
     # print("================================================")
-    for movie in movies.find({'genres': {'$regex': genre}}).skip(page * 10).limit(10):
+    for movie in movies.find({'$and': find_list}).skip(page * 10).limit(10):
         if not is_enough_for_home_page(movie):
             refersh_movie_data(movie['_id'])
             new_data_movie = movies.find({"_id": movie['_id']})
@@ -196,11 +198,13 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
 
 # une route qui se base sur les preferense des utilisateur et resort une liste de film qui peuvent leurs plaire
 
+
 @app.get("/movies/personnalized/{username}")
 async def get_movies_based_on_preference(username):
     data = calculate_genre(username)
     print(data[0])
-    test = movies.find({"$and": [ { "genres" : {"$regex": data[0]}},{"genres" : {"$regex": data[1]} }]}).limit(10)
+    test = movies.find({"$and": [{"genres": {"$regex": data[0]}}, {
+                       "genres": {"$regex": data[1]}}]}).limit(10)
     return [x for x in test]
 
 
@@ -245,7 +249,11 @@ async def genres(request: Request):
     # if error:
     #     return error
     # else:
-    return set(list(itertools.chain(*[m['genres'].split(',') for m in movies.find({}, {"genres": 1, "_id": 0}).limit(10000)])))
+    tmp = set(list(itertools.chain(*[m['genres'].split(',')
+              for m in movies.find({}, {"genres": 1, "_id": 0}).limit(10000)])))
+    tmp = list(set([g.replace(" ", "") for g in tmp]))
+    tmp.insert(0, "all")
+    return tmp
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
 
@@ -506,7 +514,7 @@ def calculate_genre(username):
         most_viewed_genre = sorted(userRes, key=userRes.get, reverse=True)
         return most_viewed_genre[:2]
     else:
-        return {"Error" : "L'user n'a pas encore like de films"}
+        return {"Error": "L'user n'a pas encore like de films"}
     # list_genre = user.split(',')
     # movies.find().limit(10)
     # print(most_viewed_genre)

@@ -61,13 +61,7 @@ export default new Vuex.Store({
         + payload.note_inf + "/" 
         + payload.note_sup + "/" 
         + payload.search_input + "/" 
-        + payload.page, 
-        { headers })
-      console.log(url 
-        + payload.genre + "/" 
-        + payload.actor + "/" 
-        + payload.note + "/" 
-        + payload.search_input + "/" 
+        // + payload.is_adult + "/" 
         + payload.page, 
         { headers })
       state.commit('setMovies', res.data)
