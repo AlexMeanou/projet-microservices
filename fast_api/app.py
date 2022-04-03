@@ -170,15 +170,15 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
     page -= 1
     l_movies = []
     find_list = []
-    find_list.append(
-        {'averageRating': {'$gte': str(int(notes_inf)), '$lte': str(int(notes_sup))}})
+    # find_list.append(
+    #     {'averageRating': {'$gte': str(int(notes_inf)), '$lte': str(int(notes_sup))}})
     if genre != 'all':
         find_list.append({'genres': {'$regex': genre}})
     # if genre != ''
-    if actor != 'nulle':
-        find_list.append({'actorList': {'$regex': actor}})
-    if search != 'nulle':
-        find_list.append({'primaryTitle': {'$regex' : search}})
+    # if actor != 'nulle':
+    #     find_list.append({'actorList': {'$regex': actor}})
+    # if search != 'nulle':
+    #     find_list.append({'primaryTitle': {'$regex': search}})
     # print("================================================")
     # print(f"/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}")
     # print({'$and': find_list})
@@ -195,6 +195,7 @@ async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,
             l_movies.append(new_data_movie)
         else:
             l_movies.append(movie)
+    print(l_movies)
     return l_movies
 
 # une route qui donne les films que le group a liké
@@ -411,17 +412,17 @@ async def callPython(username):
 
 
 def get_movie_by_id(id: str):
-    return requests.get(f'https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/')
+    return requests.get(f'https://imdb-api.com/API/Title/k_8b19gkhb/{id}/')
 
 
 def get_movie_by_genre(genre: list):
-    req = "https://imdb-api.com/API/AdvancedSearch/k_xgqcmk1o/?genres=" + genre
+    req = "https://imdb-api.com/API/AdvancedSearch/k_8b19gkhb/?genres=" + genre
     print(req)
     return requests.get(req)
 
 
 def get_popular_movies_imdb():
-    return requests.get('https://imdb-api.com/en/API/MostPopularMovies/k_xgqcmk1o')
+    return requests.get('https://imdb-api.com/en/API/MostPopularMovies/k_8b19gkhb')
 
 
 def refersh_movie_data(id):
@@ -529,7 +530,7 @@ def calculate_genre(username):
 # def getMoviesListID(idList : list):
 #     res = []
 #     for id in idList:
-#         res.append(requests.get('https://imdb-api.com/API/Title/k_xgqcmk1o/{id}/'))
+#         res.append(requests.get('https://imdb-api.com/API/Title/k_8b19gkhb/{id}/'))
 #     return res
 
 
