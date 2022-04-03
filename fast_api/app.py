@@ -1,4 +1,6 @@
 # from functions import *
+from array import array
+from multiprocessing.dummy import Array
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from tokenize import String
@@ -108,7 +110,7 @@ async def get_popular_movie(request: Request):
 #         skip = page - 1
 #         return [m for m in movies.find({'genres' : {'$regex': genre}}).skip(skip).limit(10)]
 
-# genres - page - isadulte(bool) - acteur - notes(list[1,6])
+# genres - page - isadulte(bool) - acteur - notes(list[1,6]) - date
 
 
 @app.get("/movies/notes/{notes}/{page}")
@@ -131,6 +133,7 @@ async def get_movies_by_actors(acteur):
 
 
 # Route qui renvoie une liste de films dans laquelle l'acteur joue (on peut les récup sur le front et ensuite appeler le get_movie_by_id pour les id recup)
+# resor les films et pas leurment les id !!!!
 @app.get("/movies/people/{acteur}")
 async def get_movies_from_actors(acteur):
     return people.find_one({'primaryName': acteur})["knownForTitles"]
@@ -149,10 +152,25 @@ async def get_movies_liked_by_group(name):
     print(movies_liked)
 
 
-@app.get("/movies/{genre}/{actor}/{vote}/{search}/{page}", tags=['mongo'])
-async def get_all_movies_by_page(genre: str, page: int):
+@app.get("/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}", tags=['mongo'])
+async def get_all_movies_by_page(genre: str, notes_inf: float, notes_sup: float,  actor: str, search: str, page: int):
     page -= 1
     l_movies = []
+    find_list = []
+    # if genre != 'all':
+    #     find_list.append({'genres': {'$regex': genre}})
+    # if actor != 'nulle':
+    #     # find_list.append(f"{'genres': {'$regex': {genre}}}")
+    #     pass
+    # if search != 'nulle':
+    #     # todo
+    #     find_list.append(f"{{'genres': {{'$regex' : {genre}}}}}")
+    # find_list.append(
+    #     {'averageRating': {'$gte': str(int(notes_inf)), '$lte': str(int(notes_sup))}})
+    # print("================================================")
+    # print(f"/movies/{genre}/{actor}/{notes_inf}/{notes_sup}/{search}/{page}")
+    # print({'$and': find_list})
+    # print("================================================")
     for movie in movies.find({'genres': {'$regex': genre}}).skip(page * 10).limit(10):
         if not is_enough_for_home_page(movie):
             refersh_movie_data(movie['_id'])
@@ -162,8 +180,12 @@ async def get_all_movies_by_page(genre: str, page: int):
             l_movies.append(movie)
     return l_movies
 
+# une route qui donne les films que le group a liké
 
-@app.get("/oneMovie/{movie_id}", tags=['mongo'])
+# une route qui se base sur les preferense des utilisateur et resort une liste de film qui peuvent leurs plaire
+
+
+@ app.get("/oneMovie/{movie_id}", tags=['mongo'])
 async def get_one_by_id(movie_id: str, request: Request):
     error = jwt_auth(request)
     if error:
@@ -172,7 +194,7 @@ async def get_one_by_id(movie_id: str, request: Request):
         return [a for a in movies.find({"_id": movie_id})]
 
 
-@app.get('/movie/detail/{id}', tags=['imdb'])
+@ app.get('/movie/detail/{id}', tags=['imdb'])
 async def movie_by_id(id, request: Request):
     error = jwt_auth(request)
     if error:
@@ -183,7 +205,7 @@ async def movie_by_id(id, request: Request):
         return res.json()
 
 
-@app.post('/movie/insert', tags=['mongo-test'])
+@ app.post('/movie/insert', tags=['mongo-test'])
 async def insert_movie(data: Request):
     movie = await data.json()
     print(movie)
@@ -191,14 +213,14 @@ async def insert_movie(data: Request):
     return {"data": insert_id}
 
 
-@app.get('/movie', tags=['mongo-test'])
+@ app.get('/movie', tags=['mongo-test'])
 async def get_movies():
     data = movies.find({}, {"_id": 0})
     print(list(data))
     return [x for x in movies.find({}, {"_id": 0}).limit(10)]
 
 
-@app.get("/genres/", tags=['mongo'])
+@ app.get("/genres/", tags=['mongo'])
 async def genres(request: Request):
     error = jwt_auth(request)
     # if error:
@@ -208,7 +230,7 @@ async def genres(request: Request):
     # return set(list(itertools.chain([m["genres"].split(',') for m in movies.find({},{ "genres": 1 , "_id" : 0})])))
 
 
-@app.get("/borne_note/", tags=['mongo'])
+@ app.get("/borne_note/", tags=['mongo'])
 async def borne_note(request: Request):
     error = jwt_auth(request)
     if error:
@@ -219,7 +241,7 @@ async def borne_note(request: Request):
         return [min(vote), max(vote)]
 
 
-@app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}", tags=['mongo'])
+@ app.get("/movies/{page}/{genre}/{is_adulte}/{nb_note}/{star}", tags=['mongo'])
 async def get_movie_by_genre_and_page_number(genre, page: int, request: Request):
     error = jwt_auth(request)
     if error:
@@ -230,7 +252,7 @@ async def get_movie_by_genre_and_page_number(genre, page: int, request: Request)
         return [m for m in movies.find({'genres': {'$regex': genre}}).skip(skip).limit(10)]
 
 
-@app.get("/movies/{mot_clef}", tags=['mongo'])
+@ app.get("/movies/{mot_clef}", tags=['mongo'])
 async def get_movie_by_genre_and_page_number(genre, page: int, request: Request):
     error = jwt_auth(request)
     if error:
@@ -241,7 +263,7 @@ async def get_movie_by_genre_and_page_number(genre, page: int, request: Request)
         return [m for m in movies.find({'genres': {'$regex': genre}}).skip(skip).limit(10)]
 
 
-@app.get("/movies/{page}")
+@ app.get("/movies/{page}")
 async def get_all_movies_by_page(page: int):
     page -= 1
     l_movies = []
@@ -274,7 +296,7 @@ class User(BaseModel):
     group: str = None
 
 
-@app.post("/user/register/", tags=['user'])
+@ app.post("/user/register/", tags=['user'])
 async def create_user(body: User):
     hash_password = generate_hash(body.password)
     check_exist_group = groups.find_one({"name": body.group})
@@ -315,7 +337,7 @@ async def create_user(body: User):
         }
 
 
-@app.post("/user/login/", tags=['user'])
+@ app.post("/user/login/", tags=['user'])
 async def login(body: User):
     # TODO : il faut récupérer le password du user qui est le hash dans le bdd
     user = users.find_one({'username': body.username})
@@ -352,7 +374,7 @@ async def login(body: User):
         }
 
 
-@app.get("/test")
+@ app.get("/test")
 async def callPython(username):
     # return like_movie("tt0000014", username)
     return calculate_genre(username)

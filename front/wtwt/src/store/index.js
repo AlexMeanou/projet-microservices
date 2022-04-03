@@ -58,11 +58,18 @@ export default new Vuex.Store({
         url 
         + payload.genre + "/" 
         + payload.actor + "/" 
-        + payload.vote + "/" 
-        + payload.search + "/" 
+        + payload.note_inf + "/" 
+        + payload.note_sup + "/" 
+        + payload.search_input + "/" 
         + payload.page, 
         { headers })
-      console.log(url + payload.genre + "/" + payload.page, res.data)
+      console.log(url 
+        + payload.genre + "/" 
+        + payload.actor + "/" 
+        + payload.note + "/" 
+        + payload.search_input + "/" 
+        + payload.page, 
+        { headers })
       state.commit('setMovies', res.data)
     },
     async getPopularMovies(state) {

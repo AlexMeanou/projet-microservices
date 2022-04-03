@@ -7,8 +7,8 @@
     <div class="container">
         <div class="d-flex justify-content-center">
             <div class="search">
-                <input v-model="test" class="search_input" type="text" name="" placeholder="Search here...">
-                <a @click="search(test)" class="search_icon"><i class="fa fa-search"></i></a>
+                <input v-model="search_input" class="search_input" type="text" name="" placeholder="Search here...">
+                <a @click="search(search_input)" class="search_icon"><i class="fa fa-search"></i></a>
 
             </div>
             <div class="search">
@@ -24,7 +24,7 @@
                 <label for="exampleFormControlInput1">Acteur Name</label>
                 <input v-model='actor' type="text" class="form-control" id="exampleFormControlInput1" placeholder="acteur name">
             </div>
-  
+
             <div>
                 <button type="submit">save</button>
             </div>
@@ -61,8 +61,10 @@ export default {
             genre: "all",
             page: 1,
             movies: [],
-            note: [0, 10],
-            actor: "string",
+            note_inf: 0,
+            note_sup: 10,
+            actor: "nulle",
+            search_input: "nulle",
             filterMovies: [],
             selectedGenre: "",
         }
@@ -78,10 +80,13 @@ export default {
                 page: this.page,
                 genre: this.genre,
                 is_adult: this.is_adult,
-                note: this.note,
+                note_inf: this.note_inf,
+                note_sup: this.note_sup,
+                search_input: this.search_input,
                 actor: this.actor,
             }).then(() => {
 
+                console.log("ggg")
                 this.movies = this.$store.getters.getMovies
                 console.log("les films ont etet reload", this.movies)
                 this.$router.push({
@@ -116,8 +121,9 @@ export default {
             this.filterList.genre = this.selectedGenre;
             this.filter();
         },
-        search(test) {
-            console.log(test)
+        search(search_input) {
+            this.search_input = search_input
+            console.log(search_input)
         },
         selectLangues(langues) {
             this.filterList.langues = langues;
